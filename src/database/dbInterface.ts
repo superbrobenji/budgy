@@ -3,7 +3,7 @@ interface Callback {
 }
 
 export default interface DB {
-    query(sql: string, params: any): any;
+    query(sql: string, params: string[]): {};
 }
 
 
