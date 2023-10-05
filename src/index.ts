@@ -1,13 +1,10 @@
 import { Elysia } from "elysia";
-import usersContreoller from "./routes/usersController";
-import liabilitiesController from "./routes/liabilitiesController";
-
+import routes from "./routes";
 const app = new Elysia();
 
 app.get("/", () => "Hello Elysia");
 
-app.use(usersContreoller);
-app.use(liabilitiesController);
+app.use(routes);
 
 app.listen(3000, () => {
     console.log(
