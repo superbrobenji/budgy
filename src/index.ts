@@ -1,11 +1,13 @@
 import { Elysia } from "elysia";
-import DbFactory from "./database/dbFactory";
+import usersContreoller from "./routes/usersController";
+import liabilitiesController from "./routes/liabilitiesController";
 
-const db = DbFactory.getInstance();
 const app = new Elysia();
 
 app.get("/", () => "Hello Elysia");
-app.get("/users", async () => await db.query("SELECT * FROM users", []));
+
+app.use(usersContreoller);
+app.use(liabilitiesController);
 
 app.listen(3000, () => {
     console.log(
