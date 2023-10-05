@@ -1,7 +1,5 @@
 import Elysia from "elysia";
-import DbFactory from "../database/dbFactory";
-
-const db = DbFactory.getInstance();
+import db from "../../database";
 
 export default (app: Elysia) =>
     app.group("/users", app => app

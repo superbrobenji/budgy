@@ -1,6 +1,6 @@
 import PostgresAdapter from './databaseAdapters/postgresAdapter';
 export default class DbFactory {
-    private static instance: DBList;
+    private static instance: DBAdapterList;
 
     private constructor() { }
 
@@ -19,7 +19,7 @@ export default class DbFactory {
         }
     }
 
-    public static getInstance(): DBList {
+    public static getInstance(): DBAdapterList {
         if (!DbFactory.instance) {
             DbFactory.instance = this.createDb();
         }
@@ -27,4 +27,4 @@ export default class DbFactory {
     }
 }
 
-type DBList = PostgresAdapter;
+type DBAdapterList = PostgresAdapter;
