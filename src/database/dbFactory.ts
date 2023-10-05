@@ -8,11 +8,11 @@ export default class DbFactory {
         switch (process.env.DB_TYPE) {
             case 'postgres':
                 return new PostgresAdapter(
-                    process.env.POSTGRES_USER as string,
-                    process.env.POSTGRES_HOST as string,
-                    process.env.POSTGRES_DB as string,
-                    process.env.POSTGRES_PASSWORD as string,
-                    process.env.POSTGRES_PORT as unknown as number
+                    process.env.POSTGRES_USER,
+                    process.env.POSTGRES_HOST,
+                    process.env.POSTGRES_DB,
+                    process.env.POSTGRES_PASSWORD,
+                    process.env.POSTGRES_PORT,
                 );
             default:
                 throw new Error('Invalid db type');
