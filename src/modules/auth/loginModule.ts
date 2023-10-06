@@ -1,4 +1,3 @@
-
 import { Elysia, t } from "elysia";
 import { getUserLoginDetails } from "resolvers";
 import { comparePassword } from "utils/bcrypt";
