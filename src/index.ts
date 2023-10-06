@@ -1,10 +1,22 @@
 import { Elysia } from "elysia";
-import routes from "./routes";
+import modules from "modules";
+import { cookie } from "@elysiajs/cookie";
+import { jwt } from "@elysiajs/jwt";
+
 const app = new Elysia();
 
 app.get("/", () => "Hello Elysia");
 
-app.use(routes);
+app.group("/api", app =>
+    app.use(
+        jwt({
+            name: "jwt",
+            secret: process.env.JWT_SECRET!,
+        })
+    )
+        .use(cookie())
+        .use(modules)
+);
 
 app.listen(3000, () => {
     console.log(

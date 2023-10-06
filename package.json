@@ -6,11 +6,13 @@
     "dev": "bun run --watch src/index.ts"
   },
   "dependencies": {
+    "@elysiajs/cookie": "^0.7.0",
+    "@elysiajs/jwt": "^0.7.0",
     "elysia": "latest",
     "pg": "^8.11.3"
   },
   "devDependencies": {
     "bun-types": "latest"
   },
-  "module": "src/index.js"
+  "module": "./src/index.js"
 }

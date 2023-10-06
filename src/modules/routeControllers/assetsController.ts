@@ -1,5 +1,5 @@
 import Elysia from "elysia";
-import db from "../../database";
+import db from "database";
 
 export default (app: Elysia) =>
     app.group("/assets", app => app
