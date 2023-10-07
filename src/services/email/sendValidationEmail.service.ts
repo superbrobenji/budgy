@@ -23,14 +23,13 @@ export const sendValidationEmail = async (emailInbox: string): Promise<InboxResu
         html: emailBody(verificationCode),
     }
     try {
-        const info = await transporter.sendMail(mailDetails)
-        console.log(info)
+        await transporter.sendMail(mailDetails)
         result.email_sent = true
         return {
             email_sent: true
         };
     } catch (err) {
-        console.log(err)
+        console.error(err)
         return result
     }
 }

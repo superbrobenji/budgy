@@ -21,7 +21,6 @@ export class VerificationCode {
             randomstring += chars.substring(rnum, rnum + 1);
         }
         this._verificationCode = randomstring;
-        console.log("Verification Code: ", randomstring);
         return randomstring;
     }
     get verificationCode(): string {
