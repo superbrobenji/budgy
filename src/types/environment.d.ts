@@ -13,6 +13,7 @@ declare global {
             EMAIL_VALIDATION_SENDER: string,
             EMAIL_VALIDATION_SENDER_PASSWORD: string,
             EMAIL_VALIDATION_SENDER_USERNAME: string,
+            MAX_EMAIL_VERIFICATION_TRIES: number, 
         }
     }
 }

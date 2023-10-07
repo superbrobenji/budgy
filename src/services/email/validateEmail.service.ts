@@ -9,9 +9,15 @@ interface validateEmailService {
 }
 export default async (email: string): Promise<validateEmailService> => {
     let result: validateEmailService = { status: 400, success: false, data: null, message: '' }
-    const smptResult = await sendValidationEmail(email);
+    let smptResult = await sendValidationEmail(email);
     console.log('smpt result: ', smptResult);
     if(!smptResult.email_sent){
+        for(let i = 0; i < process.env.MAX_EMAIL_VERIFICATION_TRIES; i++){
+            smptResult = await sendValidationEmail(email);
+            if(smptResult.email_sent){
+                break;
+            }
+        }
         result.status = 400;
         result.data = smptResult;
         result.success = false
