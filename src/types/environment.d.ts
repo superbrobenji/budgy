@@ -10,6 +10,9 @@ declare global {
             POSTGRES_PASSWORD: string,
             POSTGRES_PORT: number
             JWT_SECRET: string,
+            EMAIL_VALIDATION_SENDER: string,
+            EMAIL_VALIDATION_SENDER_PASSWORD: string,
+            EMAIL_VALIDATION_SENDER_USERNAME: string,
         }
     }
 }

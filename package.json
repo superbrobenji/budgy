@@ -9,6 +9,7 @@
     "@elysiajs/cookie": "^0.7.0",
     "@elysiajs/jwt": "^0.7.0",
     "elysia": "latest",
+    "nodemailer": "^6.9.5",
     "pg": "^8.11.3"
   },
   "devDependencies": {
