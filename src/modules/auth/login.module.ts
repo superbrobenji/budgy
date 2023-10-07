@@ -2,8 +2,8 @@ import { Elysia, t } from "elysia";
 import { getUserLoginDetails } from "resolvers";
 import { comparePassword } from "utils/bcrypt";
 import validateEmail from "utils/validateEmail";
-import validateEmailService from "services/validateEmail.service";
-import { VerificationCode } from "services/verificationCode.service";
+import validateEmailService from "services/email/validateEmail.service";
+import { VerificationCode } from "services/email/verificationCode.service";
 
 export default (app: Elysia) =>
     app.post("/login",

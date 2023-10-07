@@ -1,6 +1,5 @@
 
 import { InboxResults, sendValidationEmail} from "./sendValidationEmail.service";
-import validateEmail from "utils/validateEmail";
 
 interface validateEmailService {
     status: number;
@@ -10,14 +9,6 @@ interface validateEmailService {
 }
 export default async (email: string): Promise<validateEmailService> => {
     let result: validateEmailService = { status: 400, success: false, data: null, message: '' }
-    const isValidEmail = validateEmail(email);
-    if (!isValidEmail) {
-        result.status = 400;
-        result.data = null;
-        result.success = false
-        result.message = "Invalid email address."
-        return result;
-    }
     const smptResult = await sendValidationEmail(email);
     console.log('smpt result: ', smptResult);
     if(!smptResult.email_sent){

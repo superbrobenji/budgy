@@ -20,7 +20,7 @@ export const sendValidationEmail = async (emailInbox: string): Promise<InboxResu
         from: process.env.EMAIL_VALIDATION_SENDER,
         to: emailInbox,
         subject: emailSubject(verificationCode),
-        text: emailBody(verificationCode),
+        html: emailBody(verificationCode),
     }
     try {
         const info = await transporter.sendMail(mailDetails)

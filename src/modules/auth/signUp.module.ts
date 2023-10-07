@@ -1,7 +1,7 @@
 import { Elysia, t } from "elysia";
 import { createUser, getUserByEmail } from "resolvers";
-import validateEmailService from "services/validateEmail.service";
-import { VerificationCode } from "services/verificationCode.service";
+import validateEmailService from "services/email/validateEmail.service";
+import { VerificationCode } from "services/email/verificationCode.service";
 import { hashPassword } from "utils/bcrypt";
 import validateEmail from "utils/validateEmail";
 
