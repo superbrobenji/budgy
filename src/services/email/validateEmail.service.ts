@@ -5,19 +5,18 @@ import { TInboxResults, TResult } from 'services/types'
 
 interface IValidateEmailService {
     sendVerificationEmail(): Promise<TResult>,
-    verifyCode(verificationCode: string): Promise<TResult>
+    verifyCode(verificationCode: string, email: string): Promise<TResult>
 }
 
 export default class EmailVerification implements IValidateEmailService{
-    private readonly email: string;
     private result: TResult 
-    public constructor(email: string) {
+    public constructor() {
         this.result = { status: 400, success: false, data: null, message: '' }
-        this.email = email
     }
 
     private async sendEmail(): Promise<TInboxResults> {
-    const verificationCode = VerificationCode.getInstance().verificationCode;
+        const verificationInstance = VerificationCode.getInstance()
+    const verificationCode = verificationInstance.verificationCode;
     const result = { email_sent: false }
     const transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -28,7 +27,7 @@ export default class EmailVerification implements IValidateEmailService{
     })
     let mailDetails = {
         from: process.env.EMAIL_VALIDATION_SENDER,
-        to: this.email,
+        to: VerificationCode.getInstance().verificationEmail,
         subject: emailSubject(verificationCode),
         html: emailBody(verificationCode),
     }
@@ -44,8 +43,8 @@ export default class EmailVerification implements IValidateEmailService{
     }
     }
 
-    public async verifyCode(verificationCode: string): Promise<TResult> {
-        const res = VerificationCode.getInstance().verifyCode(verificationCode)
+    public async verifyCode(verificationCode: string, email: string): Promise<TResult> {
+        const res = VerificationCode.getInstance().verifyCode(verificationCode, email)
         if (res.success) {
             return res
         } else {

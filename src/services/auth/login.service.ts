@@ -15,7 +15,7 @@ export class LoginService implements ILoginService {
 
     public constructor(email: string) {
         this.email = email
-        this.emailVerification = new EmailVerification(this.email)
+        this.emailVerification = new EmailVerification()
     }
 
     public async loginUser(setCookie: any, jwt: any): Promise<TResult> {
@@ -78,6 +78,8 @@ export class LoginService implements ILoginService {
                 message: "Invalid credentials",
             };
         }
+        const verificationInstance = VerificationCode.getInstance()
+        verificationInstance.setVerificationEmail = this.email
         return await this.emailVerification.sendVerificationEmail();
     }
 }

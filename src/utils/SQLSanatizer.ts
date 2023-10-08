@@ -1,3 +1,5 @@
 export default (param: string) => {
-    return param.replace(/[\t\r\n]|(--[^\r\n]*)|(\/\*[\w\W]*?(?=\*)\*\/)|['"*;\\]/gi, "");
+    console.log(param, typeof param)
+    const string = param.toString();
+    return string.replace(/[\t\r\n]|(--[^\r\n]*)|(\/\*[\w\W]*?(?=\*)\*\/)|['"*;\\]/gi, "");
 }

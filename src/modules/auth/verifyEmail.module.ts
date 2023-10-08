@@ -4,14 +4,14 @@ import EmailVerification from "services/email/validateEmail.service";
 import { TResult } from "services/types";
 
 export default (app: Elysia) =>
-        app.post("*/verifyEmail",
+        app.post("/verify-email",
                 //@ts-ignore
                 async ({ body, set, jwt, setCookie }) => {
-                    const { verificationCode, email } = body;
+                    const { verification_code, email } = body;
                     let res: TResult;
                     const loginService = new LoginService(email)
-                    const emailService = new EmailVerification(email);
-                    const verificationData = await emailService.verifyCode(verificationCode)
+                    const emailService = new EmailVerification();
+                    const verificationData = await emailService.verifyCode(verification_code, email)
                     if (verificationData.success) {
                         res = await loginService.loginUser(setCookie, jwt)
                         set.status = res.status
@@ -29,7 +29,7 @@ export default (app: Elysia) =>
                 },
                 {
                     body: t.Object({
-                        verificationCode: t.String(),
+                        verification_code: t.String(),
                         email: t.String(),
                     }),
                 }

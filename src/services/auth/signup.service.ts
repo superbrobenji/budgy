@@ -15,7 +15,7 @@ export class SignupService implements ISignupService {
 
     public constructor(email: string) {
         this.email = email
-        this.emailVerification = new EmailVerification(this.email)
+        this.emailVerification = new EmailVerification()
     }
 
     public async signupUser(name: string, surname: string, password: string): Promise<TResult> {
@@ -23,13 +23,18 @@ export class SignupService implements ISignupService {
             const { hash, salt } = await hashPassword(password);
 
             const newUser = await createUser(name, surname, this.email, hash, salt);
-            return {
-                status: 200,
-                success: true,
-                message: "Account created",
-                data: {
-                    user: newUser,
-                },
+            const verificationEmail = await this.emailVerification.sendVerificationEmail();
+            if (verificationEmail.success) {
+                return {
+                    status: 200,
+                    success: true,
+                    message: "Account created",
+                    data: {
+                        user: newUser,
+                    },
+                }
+            } else {
+                return verificationEmail
             }
         } catch (err) {
             console.error(err)
@@ -70,6 +75,11 @@ export class SignupService implements ISignupService {
                 message: "Passwords do not match.",
             };
         }
-        return await this.emailVerification.sendVerificationEmail();
+        return {
+            status: 200,
+            success: true,
+            data: null,
+            message: "Valid credentials",
+        }
     }
 }
