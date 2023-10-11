@@ -1,6 +1,6 @@
 
 import { createUser, getUserByEmail } from "resolvers/users";
-import { Tfa } from "services/twoFactorAuthentication/tfa";
+import { Tfa } from "services/twoFactorAuthentication/tfa.service";
 import { TResult } from "services/types";
 import { hashPassword } from "utils/bcrypt";
 import validateEmail from "utils/validateEmail";

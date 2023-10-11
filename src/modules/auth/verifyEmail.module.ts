@@ -1,6 +1,6 @@
 import { Elysia, t } from "elysia";
 import { LoginService } from "services/auth/login.service";
-import { Tfa } from "services/twoFactorAuthentication/tfa";
+import { Tfa } from "services/twoFactorAuthentication/tfa.service";
 import { TResult } from "services/types";
 
 export default (app: Elysia) =>

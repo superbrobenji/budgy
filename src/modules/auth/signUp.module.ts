@@ -16,6 +16,7 @@ export default (app: Elysia) =>
                     success: res.success
                 }
             } else {
+                set.status = 400
                 return {
                     ...verifyData,
                     success: false

@@ -1,6 +1,5 @@
 import { getUserIdByEmail, getUserLoginDetails } from "resolvers/users";
-import { VerificationCode } from "services/email/verificationCode.service";
-import { Tfa } from "services/twoFactorAuthentication/tfa";
+import { Tfa } from "services/twoFactorAuthentication/tfa.service";
 import { TResult } from "services/types";
 import { comparePassword } from "utils/bcrypt";
 import validateEmail from "utils/validateEmail";
