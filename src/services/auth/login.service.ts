@@ -1,6 +1,6 @@
 import { getUserIdByEmail, getUserLoginDetails } from "resolvers/users";
-import EmailVerification from "services/email/validateEmail.service";
 import { VerificationCode } from "services/email/verificationCode.service";
+import { Tfa } from "services/twoFactorAuthentication/tfa";
 import { TResult } from "services/types";
 import { comparePassword } from "utils/bcrypt";
 import validateEmail from "utils/validateEmail";
@@ -11,11 +11,9 @@ interface ILoginService {
 }
 export class LoginService implements ILoginService {
     private readonly email: string
-    private readonly emailVerification: EmailVerification
 
     public constructor(email: string) {
         this.email = email
-        this.emailVerification = new EmailVerification()
     }
 
     public async loginUser(setCookie: any, jwt: any): Promise<TResult> {
@@ -78,8 +76,7 @@ export class LoginService implements ILoginService {
                 message: "Invalid credentials",
             };
         }
-        const verificationInstance = VerificationCode.getInstance()
-        verificationInstance.setVerificationEmail = this.email
-        return await this.emailVerification.sendVerificationEmail();
+        const tfa = new Tfa(this.email) 
+        return await tfa.createAndSendToken();
     }
 }

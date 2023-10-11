@@ -1,17 +1,17 @@
 import { Elysia, t } from "elysia";
 import { LoginService } from "services/auth/login.service";
-import EmailVerification from "services/email/validateEmail.service";
+import { Tfa } from "services/twoFactorAuthentication/tfa";
 import { TResult } from "services/types";
 
 export default (app: Elysia) =>
         app.post("/verify-email",
                 //@ts-ignore
                 async ({ body, set, jwt, setCookie }) => {
-                    const { verification_code, email } = body;
+                    const { clientToken, email } = body;
                     let res: TResult;
                     const loginService = new LoginService(email)
-                    const emailService = new EmailVerification();
-                    const verificationData = await emailService.verifyCode(verification_code, email)
+                    const tfa = new Tfa(email);
+                    const verificationData = await tfa.verifyToken(clientToken, email)
                     if (verificationData.success) {
                         res = await loginService.loginUser(setCookie, jwt)
                         set.status = res.status
@@ -21,6 +21,7 @@ export default (app: Elysia) =>
                             message: res.message
                         }
                     } else {
+                        set.status = 400
                         return {
                             ...verificationData,
                             success: false
@@ -29,7 +30,7 @@ export default (app: Elysia) =>
                 },
                 {
                     body: t.Object({
-                        verification_code: t.String(),
+                        clientToken: t.String(),
                         email: t.String(),
                     }),
                 }

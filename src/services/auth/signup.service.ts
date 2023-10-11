@@ -1,6 +1,6 @@
 
 import { createUser, getUserByEmail } from "resolvers/users";
-import EmailVerification from "services/email/validateEmail.service";
+import { Tfa } from "services/twoFactorAuthentication/tfa";
 import { TResult } from "services/types";
 import { hashPassword } from "utils/bcrypt";
 import validateEmail from "utils/validateEmail";
@@ -11,11 +11,9 @@ interface ISignupService {
 }
 export class SignupService implements ISignupService {
     private readonly email: string
-    private readonly emailVerification: EmailVerification
 
     public constructor(email: string) {
         this.email = email
-        this.emailVerification = new EmailVerification()
     }
 
     public async signupUser(name: string, surname: string, password: string): Promise<TResult> {
@@ -23,7 +21,8 @@ export class SignupService implements ISignupService {
             const { hash, salt } = await hashPassword(password);
 
             const newUser = await createUser(name, surname, this.email, hash, salt);
-            const verificationEmail = await this.emailVerification.sendVerificationEmail();
+            const tfa = new Tfa(this.email)
+            const verificationEmail = await tfa.createAndSendToken();
             if (verificationEmail.success) {
                 return {
                     status: 200,
