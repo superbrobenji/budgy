@@ -35,6 +35,7 @@ export class Tfa implements TTfa {
     public async verifyToken(clientToken: string, email: string): Promise<TResult> {
         try {
             const isValid = await validateToken(email, clientToken);
+            console.log(isValid)
             if (isValid) {
                 return {
                     status: 200,
@@ -74,7 +75,8 @@ export class Tfa implements TTfa {
         const userArray = await getUserByEmail(this.email);
         const name = userArray[0].name;
         const subject = `Your verification Token - ${token}`
-        const body = `<h1> Hello ${name} Your verification Token is ${token} </h1>`
+        const body = `<h1> Hello ${name}!</h1> <p> Your verification Token is ${token}. </p>`
+        console.log(subject, body, this.email)
         return await mailer.sendEmail(this.email, subject, body)
     }
 } 

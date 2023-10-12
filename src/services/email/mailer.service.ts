@@ -18,7 +18,9 @@ export class Mailer implements TMailer {
             subject: subject,
             html: body,
         }
-        for (let i = 0; i < process.env.MAX_EMAIL_VERIFICATION_TRIES; i++) {
+        console.log("ready to send email")
+        for (let i = 0; i < process.env.MAX_EMAIL_VERIFICATION_ATTEMPTS; i++) {
+            console.log("sending email")
             try {
                 await transporter.sendMail(mailDetails)
                 return {
@@ -29,7 +31,7 @@ export class Mailer implements TMailer {
                 }
             } catch (err) {
                 console.error(err)
-                if (i === process.env.MAX_EMAIL_VERIFICATION_TRIES - 1) {
+                if (i === process.env.MAX_EMAIL_VERIFICATION_ATTEMPTS - 1) {
                 return {
                     status: 500, 
                     success: false,
