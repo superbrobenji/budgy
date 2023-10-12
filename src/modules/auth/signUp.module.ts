@@ -3,12 +3,13 @@ import { SignupService } from "services/auth/signup.service";
 
 export default (app: Elysia) =>
     app.post("/signup",
-        async ({ body, set }) => {
+             //@ts-ignore
+        async ({ body, set, setCookie }) => {
             const { email, name, surname, password, verifyPassword } = body;
             const signupService = new SignupService(email);
             const verifyData = await signupService.verifySignupDetails(password, verifyPassword)
             if (verifyData.success) {
-                const res = await signupService.signupUser(name, surname, password)
+                const res = await signupService.signupUser(name, surname, password, setCookie)
                 set.status = res.status
                 return {
                     message: res.message,

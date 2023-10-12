@@ -1,11 +1,11 @@
-import { getUserIdByEmail, getUserLoginDetails } from "resolvers/users";
+import { getUserIdByEmailHash, getUserLoginDetails } from "resolvers/users";
 import { Tfa } from "services/twoFactorAuthentication/tfa.service";
 import { TResult } from "services/types";
-import { comparePassword } from "utils/bcrypt";
+import { comparePassword, hashEmail } from "utils/bcrypt";
 import validateEmail from "utils/validateEmail";
 
 interface ILoginService {
-    verifyLoginDetails(password: string): Promise<TResult>
+    verifyLoginDetails(password: string, setCookie: any): Promise<TResult>
     loginUser(setCookie: any, jwt: any): Promise<TResult>
 }
 export class LoginService implements ILoginService {
@@ -17,7 +17,8 @@ export class LoginService implements ILoginService {
 
     public async loginUser(setCookie: any, jwt: any): Promise<TResult> {
         try {
-            const userArray = await getUserIdByEmail(this.email)
+            const emailCrypt = await hashEmail(this.email);
+            const userArray = await getUserIdByEmailHash(emailCrypt.hash);
             const userId = userArray[0].id
             // generate access 
             const accessToken = await jwt.sign({
@@ -45,7 +46,7 @@ export class LoginService implements ILoginService {
         };
     }
 
-    public async verifyLoginDetails(password: string): Promise<TResult> {
+    public async verifyLoginDetails(password: string, setCookie: any): Promise<TResult> {
         const isValidEmail = validateEmail(this.email);
         if (!isValidEmail) {
             return {
@@ -55,7 +56,8 @@ export class LoginService implements ILoginService {
                 message: "Invalid credentials",
             };
         }
-        const userArray = await getUserLoginDetails(this.email);
+        const emailCrypt = await hashEmail(this.email);
+        const userArray = await getUserLoginDetails(emailCrypt.hash);
         const user = userArray[0];
         if (!user) {
             return {
@@ -76,6 +78,6 @@ export class LoginService implements ILoginService {
             };
         }
         const tfa = new Tfa(this.email) 
-        return await tfa.createAndSendToken();
+        return await tfa.createAndSendToken(setCookie);
     }
 }

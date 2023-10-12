@@ -4,10 +4,10 @@ import { LoginService } from "services/auth/login.service";
 export default (app: Elysia) =>
     app.post("/login",
         //@ts-ignore
-        async ({ body, set }) => {
+        async ({ body, set, setCookie }) => {
             const { email, password } = body;
             const loginServie = new LoginService(email);
-            const res = await loginServie.verifyLoginDetails(password)
+            const res = await loginServie.verifyLoginDetails(password, setCookie)
             set.status = res.status
             return {
                 success: res.success,

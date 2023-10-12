@@ -1,13 +1,12 @@
-
-import { createUser, getUserByEmail } from "resolvers/users";
+import { createUser, getUserByEmailHash } from "resolvers/users";
 import { Tfa } from "services/twoFactorAuthentication/tfa.service";
 import { TResult } from "services/types";
-import { hashPassword } from "utils/bcrypt";
+import { hashEmail, hashPassword } from "utils/bcrypt";
 import validateEmail from "utils/validateEmail";
 
 interface ISignupService {
     verifySignupDetails(password: string, verifyPassword: string): Promise<TResult>
-    signupUser(name: string, surname: string, password: string): Promise<TResult>
+    signupUser(name: string, surname: string, password: string, setCookie: any): Promise<TResult>
 }
 export class SignupService implements ISignupService {
     private readonly email: string
@@ -16,13 +15,13 @@ export class SignupService implements ISignupService {
         this.email = email
     }
 
-    public async signupUser(name: string, surname: string, password: string): Promise<TResult> {
+    public async signupUser(name: string, surname: string, password: string, setCookie: any): Promise<TResult> {
         try {
             const { hash, salt } = await hashPassword(password);
-
-            const newUser = await createUser(name, surname, this.email, hash, salt);
+            const emailCrypt = await hashEmail(this.email);
+            const newUser = await createUser(name, surname, emailCrypt.hash, emailCrypt.salt, hash, salt);
             const tfa = new Tfa(this.email)
-            const verificationEmail = await tfa.createAndSendToken();
+            const verificationEmail = await tfa.createAndSendToken(setCookie);
             if (verificationEmail.success) {
                 return {
                     status: 200,
@@ -56,7 +55,8 @@ export class SignupService implements ISignupService {
                 message: "Invalid credentials",
             };
         }
-        const emailExists = await getUserByEmail(this.email);
+        const emailCrypt = await hashEmail(this.email);
+        const emailExists = await getUserByEmailHash(emailCrypt.hash);
         if (emailExists.length > 0) {
             return {
                 status: 400,
