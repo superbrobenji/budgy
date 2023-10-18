@@ -12,7 +12,6 @@ export class Tfa implements TTfa {
         this.security = new Security();
     }
     public async createAndSendToken(setCookie: any, email: string): Promise<TResult> {
-        console.log("creating token")
         const chars = "239287321905";
         const string_length = 6;
         let randomstring = "";
@@ -23,8 +22,7 @@ export class Tfa implements TTfa {
         try {
             await createToken(email, randomstring);
             const res = await this.sendEmail(randomstring, email);
-            console.log("Email sent")
-            
+
             const emailCrypt = this.security.encrypt(email);
             setCookie("tfa", emailCrypt, {
                 // TODO set cookie age to env var
@@ -42,10 +40,12 @@ export class Tfa implements TTfa {
             }
         }
     }
-    //TODO change this to return the result type
     public async verifyToken(clientToken: string, email: string, cookie: any, setCookie: any): Promise<TResult> {
-        console.log("email cookie: ", cookie.tfa)
-        if(!cookie!.tfa){
+        if (!cookie!.tfa) {
+            setCookie("tfa", "", {
+                maxAge: -4,
+                path: "/",
+            })
             return {
                 status: 400,
                 success: false,
@@ -53,18 +53,20 @@ export class Tfa implements TTfa {
                 message: "Token expired. Please try again"
             }
         }
-       const emailHash = cookie!.tfa
-       const serverEmail = this.security.decrypt(emailHash) as string;
-       console.log("server email: ", serverEmail)
-         console.log("client email: ", email)
-         if(serverEmail !== email){
+        const emailHash = cookie!.tfa
+        const serverEmail = this.security.decrypt(emailHash) as string;
+        if (serverEmail !== email) {
+            setCookie("tfa", "", {
+                maxAge: -4,
+                path: "/",
+            })
             return {
                 status: 400,
                 success: false,
                 data: null,
                 message: "Incorrect token. Please try again"
             }
-         }
+        }
         try {
             const isValid = await validateToken(email, clientToken);
             if (isValid) {
@@ -81,6 +83,10 @@ export class Tfa implements TTfa {
             }
         } catch (err) {
             console.error(err)
+            setCookie("tfa", "", {
+                maxAge: -4,
+                path: "/",
+            })
             return {
                 status: 400,
                 success: false,
@@ -88,12 +94,16 @@ export class Tfa implements TTfa {
                 message: "Email not verified."
             }
         }
-            return {
-                status: 500,
-                success: false,
-                data: null,
-                message: "Error verifying token"
-            }
+        setCookie("tfa", "", {
+            maxAge: -4,
+            path: "/",
+        })
+        return {
+            status: 500,
+            success: false,
+            data: null,
+            message: "Error verifying token"
+        }
     }
     private async sendEmail(token: string, email: string): Promise<TResult> {
         const mailer = new Mailer();
@@ -101,7 +111,6 @@ export class Tfa implements TTfa {
         const name = userArray[0].name;
         const subject = `Your verification Token - ${token}`
         const body = `<h1> Hello ${name}!</h1> <p> Your verification Token is ${token}. </p>`
-        console.log(subject, body, email)
         return await mailer.sendEmail(email, subject, body)
     }
 } 

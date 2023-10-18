@@ -18,9 +18,7 @@ export class Mailer implements TMailer {
             subject: subject,
             html: body,
         }
-        console.log("ready to send email")
         for (let i = 0; i < process.env.MAX_EMAIL_VERIFICATION_ATTEMPTS; i++) {
-            console.log("sending email")
             try {
                 await transporter.sendMail(mailDetails)
                 return {
