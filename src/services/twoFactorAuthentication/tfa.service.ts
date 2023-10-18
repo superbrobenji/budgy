@@ -1,17 +1,18 @@
 import { TTfa } from './types';
 import { createToken, validateToken } from 'resolvers/twoFactorAuthentication';
-import { getUserByEmailHash } from 'resolvers/users'
+import { getUserByEmail } from 'resolvers/users'
 import { Mailer } from 'services/email/mailer.service';
 import { TResult } from 'services/types';
-import { hashEmail } from 'utils/bcrypt';
+import Security from 'utils/bcrypt';
 
 export class Tfa implements TTfa {
-    private email: string;
+    private readonly security: Security;
 
-    public constructor(email: string) {
-        this.email = email;
+    public constructor() {
+        this.security = new Security();
     }
-    public async createAndSendToken(setCookie: any): Promise<TResult> {
+    public async createAndSendToken(setCookie: any, email: string): Promise<TResult> {
+        console.log("creating token")
         const chars = "239287321905";
         const string_length = 6;
         let randomstring = "";
@@ -20,11 +21,12 @@ export class Tfa implements TTfa {
             randomstring += chars.substring(rnum, rnum + 1);
         }
         try {
-            const emailCrypt = await hashEmail(this.email);
-            await createToken(emailCrypt.hash, randomstring);
-            const res = await this.sendEmail(randomstring);
+            await createToken(email, randomstring);
+            const res = await this.sendEmail(randomstring, email);
+            console.log("Email sent")
             
-            setCookie("tfa", emailCrypt.hash, {
+            const emailCrypt = this.security.encrypt(email);
+            setCookie("tfa", emailCrypt, {
                 // TODO set cookie age to env var
                 maxAge: 5 * 60, // 5 minutes
                 path: "/",
@@ -52,8 +54,10 @@ export class Tfa implements TTfa {
             }
         }
        const emailHash = cookie!.tfa
-       const clientEmailCrypt = await hashEmail(email)
-         if(emailHash !== clientEmailCrypt.hash){
+       const serverEmail = this.security.decrypt(emailHash) as string;
+       console.log("server email: ", serverEmail)
+         console.log("client email: ", email)
+         if(serverEmail !== email){
             return {
                 status: 400,
                 success: false,
@@ -62,8 +66,7 @@ export class Tfa implements TTfa {
             }
          }
         try {
-            const isValid = await validateToken(clientEmailCrypt.hash, clientToken);
-            console.log(isValid)
+            const isValid = await validateToken(email, clientToken);
             if (isValid) {
                 setCookie("tfa", "", {
                     maxAge: -4,
@@ -92,14 +95,13 @@ export class Tfa implements TTfa {
                 message: "Error verifying token"
             }
     }
-    private async sendEmail(token: string): Promise<TResult> {
+    private async sendEmail(token: string, email: string): Promise<TResult> {
         const mailer = new Mailer();
-        const emailCrypt = await hashEmail(this.email);
-        const userArray = await getUserByEmailHash(emailCrypt.hash);
+        const userArray = await getUserByEmail(email);
         const name = userArray[0].name;
         const subject = `Your verification Token - ${token}`
         const body = `<h1> Hello ${name}!</h1> <p> Your verification Token is ${token}. </p>`
-        console.log(subject, body, this.email)
-        return await mailer.sendEmail(this.email, subject, body)
+        console.log(subject, body, email)
+        return await mailer.sendEmail(email, subject, body)
     }
 } 

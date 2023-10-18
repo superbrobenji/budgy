@@ -1,7 +1,7 @@
-import { createUser, getUserByEmailHash } from "resolvers/users";
+import { createUser, getUserByEmail } from "resolvers/users";
 import { Tfa } from "services/twoFactorAuthentication/tfa.service";
 import { TResult } from "services/types";
-import { hashEmail, hashPassword } from "utils/bcrypt";
+import Security from "utils/bcrypt";
 import validateEmail from "utils/validateEmail";
 
 interface ISignupService {
@@ -10,18 +10,19 @@ interface ISignupService {
 }
 export class SignupService implements ISignupService {
     private readonly email: string
+    private readonly security: Security;
 
     public constructor(email: string) {
         this.email = email
+        this.security = new Security()
     }
 
     public async signupUser(name: string, surname: string, password: string, setCookie: any): Promise<TResult> {
         try {
-            const { hash, salt } = await hashPassword(password);
-            const emailCrypt = await hashEmail(this.email);
-            const newUser = await createUser(name, surname, emailCrypt.hash, emailCrypt.salt, hash, salt);
-            const tfa = new Tfa(this.email)
-            const verificationEmail = await tfa.createAndSendToken(setCookie);
+            const { hash, salt } = await this.security.hashPassword(password);
+            const newUser = await createUser(name, surname, this.email, hash, salt);
+            const tfa = new Tfa()
+            const verificationEmail = await tfa.createAndSendToken(setCookie, this.email);
             if (verificationEmail.success) {
                 return {
                     status: 200,
@@ -55,8 +56,7 @@ export class SignupService implements ISignupService {
                 message: "Invalid credentials",
             };
         }
-        const emailCrypt = await hashEmail(this.email);
-        const emailExists = await getUserByEmailHash(emailCrypt.hash);
+        const emailExists = await getUserByEmail(this.email);
         if (emailExists.length > 0) {
             return {
                 status: 400,

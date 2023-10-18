@@ -1,8 +1,8 @@
-import { getUserIdByEmailHash, getUserLoginDetails } from "resolvers/users";
+import { getUserIdByEmail, getUserLoginDetails } from "resolvers/users";
 import { Tfa } from "services/twoFactorAuthentication/tfa.service";
 import { TResult } from "services/types";
-import { comparePassword, hashEmail } from "utils/bcrypt";
 import validateEmail from "utils/validateEmail";
+import Security from "utils/bcrypt";
 
 interface ILoginService {
     verifyLoginDetails(password: string, setCookie: any): Promise<TResult>
@@ -10,15 +10,15 @@ interface ILoginService {
 }
 export class LoginService implements ILoginService {
     private readonly email: string
-
+    private readonly security: Security;
     public constructor(email: string) {
         this.email = email
+        this.security = new Security()
     }
 
     public async loginUser(setCookie: any, jwt: any): Promise<TResult> {
         try {
-            const emailCrypt = await hashEmail(this.email);
-            const userArray = await getUserIdByEmailHash(emailCrypt.hash);
+            const userArray = await getUserIdByEmail(this.email);
             const userId = userArray[0].id
             // generate access 
             const accessToken = await jwt.sign({
@@ -56,8 +56,7 @@ export class LoginService implements ILoginService {
                 message: "Invalid credentials",
             };
         }
-        const emailCrypt = await hashEmail(this.email);
-        const userArray = await getUserLoginDetails(emailCrypt.hash);
+        const userArray = await getUserLoginDetails(this.email);
         const user = userArray[0];
         if (!user) {
             return {
@@ -68,7 +67,7 @@ export class LoginService implements ILoginService {
             };
         }
         // verify password
-        const match = await comparePassword(password, user.salt, user.hash);
+        const match = await this.security.comparePassword(password, user.salt, user.hash);
         if (!match) {
             return {
                 status: 400,
@@ -77,7 +76,7 @@ export class LoginService implements ILoginService {
                 message: "Invalid credentials",
             };
         }
-        const tfa = new Tfa(this.email) 
-        return await tfa.createAndSendToken(setCookie);
+        const tfa = new Tfa() 
+        return await tfa.createAndSendToken(setCookie, this.email);
     }
 }

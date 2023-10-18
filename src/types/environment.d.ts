@@ -14,7 +14,7 @@ declare global {
             EMAIL_VALIDATION_SENDER_PASSWORD: string,
             EMAIL_VALIDATION_SENDER_USERNAME: string,
             MAX_EMAIL_VERIFICATION_ATTEMPTS: number, 
-            EMAIL_SALT: string,
+            CRYPTO_KEY: string,
         }
     }
 }

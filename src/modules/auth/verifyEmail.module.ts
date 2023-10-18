@@ -10,7 +10,7 @@ export default (app: Elysia) =>
             const { clientToken, email } = body;
             let res: TResult;
             const loginService = new LoginService(email)
-            const tfa = new Tfa(email);
+            const tfa = new Tfa();
             const verificationData = await tfa.verifyToken(clientToken, email, cookie, setCookie)
             if (verificationData.success) {
                 res = await loginService.loginUser(setCookie, jwt)
