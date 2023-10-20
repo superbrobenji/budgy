@@ -1,4 +1,6 @@
 import PostgresAdapter from './databaseAdapters/postgresAdapter';
+
+//TDOO create interface for DbFactory
 export default class DbFactory {
     private static instance: DBAdapterList;
 

@@ -1,5 +1,6 @@
-import { randomBytes, pbkdf2, createHash, createCipheriv, createDecipheriv } from 'crypto';
+import { randomBytes, pbkdf2, createCipheriv, createDecipheriv } from 'crypto';
 
+// TODO create an interface for Security
 export default class Security {
     encoding: BufferEncoding = 'hex';
 

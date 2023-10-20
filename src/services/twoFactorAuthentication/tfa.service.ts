@@ -5,6 +5,7 @@ import { Mailer } from 'services/email/mailer.service';
 import { TResult } from 'services/types';
 import Security from 'utils/bcrypt';
 
+//TODO add interface to types file
 export class Tfa implements TTfa {
     private readonly security: Security;
 

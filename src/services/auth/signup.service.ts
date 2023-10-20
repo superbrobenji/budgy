@@ -4,6 +4,7 @@ import { TResult } from "services/types";
 import Security from "utils/bcrypt";
 import validateEmail from "utils/validateEmail";
 
+//TODO add interface to types file
 interface ISignupService {
     verifySignupDetails(password: string, verifyPassword: string): Promise<TResult>
     signupUser(name: string, surname: string, password: string, setCookie: any): Promise<TResult>
