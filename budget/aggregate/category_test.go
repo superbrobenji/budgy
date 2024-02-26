@@ -146,7 +146,7 @@ func TestCategory_AddItem(t *testing.T) {
 				t.Errorf("expected error %v, got %v", tc.expectedErr, err)
 			}
 			items := category.GetItems()
-			isEqual := equalSlices(items, tc.expectedValue)
+			isEqual := equalItemSlices(items, tc.expectedValue)
 			if !isEqual {
 				t.Errorf("expected value %v, got %v", tc.expectedValue, items)
 			}
@@ -204,7 +204,7 @@ func TestCategory_RemoveItem(t *testing.T) {
 				t.Errorf("expected error %v, got %v", tc.expectedErr, err)
 			}
 			items := category.GetItems()
-			isEqual := equalSlices(items, tc.expectedValue)
+			isEqual := equalItemSlices(items, tc.expectedValue)
 			if !isEqual {
 				t.Errorf("expected value %v, got %v", tc.expectedValue, items)
 			}
@@ -212,7 +212,7 @@ func TestCategory_RemoveItem(t *testing.T) {
 	}
 }
 
-func equalSlices(a, b []*entity.Item) bool {
+func equalItemSlices(a, b []*entity.Item) bool {
 	if len(a) != len(b) {
 		return false
 	}
