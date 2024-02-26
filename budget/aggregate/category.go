@@ -1,32 +1,25 @@
 package aggregate
 
 import (
-	"errors"
 	"strings"
 
 	"github.com/google/uuid"
 	"github.com/superbrobenji/budgy/budget/model/entity"
 )
 
-var (
-	ErrInvalidCategory       = errors.New("a category must have a valid name. 'Income' and 'Pre-Income Deductions' are reserved names")
-	ErrReservedNameSpace     = errors.New("'Income' and 'Pre-Income Deductions' are reserved names")
-	ErrUnInitialisedCategory = errors.New("a category must first be initialised")
-)
-
 type Category struct {
+    //TODO possibly make the items aggregates
 	category *entity.Category
 	items    []*entity.Item
 }
 
+// TODO add all the budget functions
 func NewCategory(name string) (Category, error) {
-	if name == "" || name == "Income" || name == "Pre-Income Deductions" {
-		lowercaseName := strings.ToLower(name)
-		if lowercaseName == "income" || lowercaseName == "pre-income deductions" {
-			return Category{}, ErrReservedNameSpace
-		}
-		return Category{}, ErrInvalidCategory
+	nameValidationErr := nameValidation(name)
+	if nameValidationErr != nil {
+		return Category{}, nameValidationErr
 	}
+
 	category := &entity.Category{
 		Name: name,
 		ID:   uuid.New(),
@@ -49,17 +42,25 @@ func (c *Category) SetName(name string) error {
 	if c.category == nil {
 		//lazy initialise if category does not exist
 		// c.category = &entity.Category{}
-		return ErrUnInitialisedCategory
+		return ErrUnInitialised
+	}
+	nameValidationErr := nameValidation(name)
+	if nameValidationErr != nil {
+		return nameValidationErr
 	}
 	c.category.Name = name
 	return nil
 }
 
 func (c *Category) AddItem(item *entity.Item) error {
+	//TODO update the budget based on amount on transaction
 	if c.category == nil {
 		//lazy initialise if category does not exist
 		// c.category = &entity.Category{}
-		return ErrUnInitialisedCategory
+		return ErrUnInitialised
+	}
+	if item == nil {
+		return ErrInvalidItem
 	}
 	c.items = append(c.items, item)
 	return nil
@@ -69,11 +70,15 @@ func (c *Category) GetItems() []*entity.Item {
 	return c.items
 }
 
-func (c *Category) DeleteItem(itemToRemove *entity.Item) error {
+func (c *Category) RemoveItem(itemToRemove *entity.Item) error {
+	//TODO update the budget based on amount on transaction
 	if c.category == nil {
 		//lazy initialise if category does not exist
 		// c.category = &entity.Category{}
-		return ErrUnInitialisedCategory
+		return ErrUnInitialised
+	}
+	if itemToRemove == nil {
+		return ErrInvalidItem
 	}
 
 	indexToRemove := -1
@@ -87,5 +92,16 @@ func (c *Category) DeleteItem(itemToRemove *entity.Item) error {
 		return nil
 	}
 	c.items = append(c.items[:indexToRemove], c.items[indexToRemove+1:]...)
+	return nil
+}
+
+func nameValidation(name string) error {
+	if name == "" {
+		return ErrInvalidName
+	}
+	lowercaseName := strings.ToLower(name)
+	if lowercaseName == "income" || lowercaseName == "pre-income deductions" {
+		return ErrReservedCategoryNameSpace
+	}
 	return nil
 }

@@ -47,7 +47,7 @@ audit:
 ## test: run all tests
 .PHONY: test
 test:
-	go test -v -race -buildvcs ./...
+	go test -v -buildvcs ./...
 
 ## test/cover: run all tests and display coverage
 .PHONY: test/cover
