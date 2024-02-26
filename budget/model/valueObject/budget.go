@@ -1,7 +1,7 @@
 package valueobject
 
 type Budget struct {
-	Paid      float32
+	Spent      float32
 	Total     float32
 	Remaining float32
 }
