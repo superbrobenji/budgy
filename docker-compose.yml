@@ -1,0 +1,17 @@
+services:
+  backend_dev:
+    image: budgy:${VERSION}
+    build:
+      dockerfile: Dockerfile
+      context: .
+      target: dev
+    volumes:
+      - .:/cmd
+  backend_prod:
+    image: budgy:${VERSION}
+    build:
+      dockerfile: Dockerfile
+      context: .
+      target: release-stage
+    volumes:
+      - .:/cmd

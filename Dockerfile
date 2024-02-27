@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM golang:1.21.6 
+FROM golang:1.21.6 as dev
 WORKDIR /cmd
 COPY go.mod go.sum makefile ./
 RUN go mod download

@@ -1,7 +1,7 @@
 MAIN_PACKAGE_PATH := ./cmd
 BINARY_NAME := budgy
-APP_VERSION := 0.1.0
-
+DEV_BACKEND := backend_dev
+PROD_BACKEND := backend_prod
 # ==================================================================================== #
 # HELPERS
 # ==================================================================================== #
@@ -64,7 +64,7 @@ test/cover:
 ## run: run the  application
 .PHONY: run
 run: build 
-	docker run -d --publish 8080:8080 --name ${BINARY_NAME}_${APP_VERSION} ${BINARY_NAME}:${APP_VERSION}
+	docker compose run -d -p 8080:8080 --name ${BINARY_NAME} ${DEV_BACKEND}
 
 ## run/live: run the applicatitn with reloading on file changes
 .PHONY: run/live
@@ -82,12 +82,12 @@ run/live:
 ## build: build the dev docker image
 .PHONY: build
 build:
-	docker build -t ${BINARY_NAME}:${APP_VERSION} .
+	docker compose build  
 
 ## build/dev/image: build the dev docker image
 .PHONY: build/prod
 build/prod/image:
-	docker build -t ${BINARY_NAME}:multistage . -f Dockerfile.multistage 
+	docker compose build -f Dockerfile.multistage 
 
 # ==================================================================================== #
 # OPERATIONS
@@ -95,7 +95,7 @@ build/prod/image:
 
 ## push: push changes to the remote Git repository
 .PHONY: push
-push: tidy audit no-dirty
+push: tidy 
 	git push
 
 ## production/deploy: deploy the application to production
