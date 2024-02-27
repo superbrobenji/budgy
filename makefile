@@ -1,5 +1,6 @@
-MAIN_PACKAGE_PATH := ./cmd/main
+MAIN_PACKAGE_PATH := ./cmd
 BINARY_NAME := budgy
+APP_VERSION := 0.1.0
 
 # ==================================================================================== #
 # HELPERS
@@ -49,24 +50,22 @@ audit:
 test:
 	go test -v -buildvcs ./...
 
+## test: run all tests
+.PHONY: test/race
+test/race:
+	go test -v -race -buildvcs ./...
+
 ## test/cover: run all tests and display coverage
 .PHONY: test/cover
 test/cover:
 	go test -v -race -buildvcs -coverprofile=/tmp/coverage.out ./...
 	go tool cover -html=/tmp/coverage.out
 
-## build: build the application
-.PHONY: build
-build:
-    # Include additional build steps, like TypeScript, SCSS or Tailwind compilation here...
-	go build -o=/tmp/bin/${BINARY_NAME} ${MAIN_PACKAGE_PATH}
-
 ## run: run the  application
 .PHONY: run
-run: build
-	/tmp/bin/${BINARY_NAME}
-
-## run/live: run the application with reloading on file changes
+run: 
+	docker run -d --publish 8080:8080 --name ${BINARY_NAME}_${APP_VERSION} ${BINARY_NAME}:${APP_VERSION}
+## run/live: run the applicatitn with reloading on file changes
 .PHONY: run/live
 run/live:
 	go run github.com/cosmtrek/air@v1.43.0 \
@@ -88,6 +87,25 @@ push: tidy audit no-dirty
 ## production/deploy: deploy the application to production
 .PHONY: production/deploy
 production/deploy: confirm tidy audit no-dirty
-	GOOS=linux GOARCH=amd64 go build -ldflags='-s' -o=/tmp/bin/linux_amd64/${BINARY_NAME} ${MAIN_PACKAGE_PATH}
-	upx -5 /tmp/bin/linux_amd64/${BINARY_NAME}
+	build/prod/image
 	# Include additional deployment steps here...
+	
+## build/docker: build the application in docker
+.PHONY: build/docker
+build/docker:
+    # Include additional build steps, like TypeScript, SCSS or Tailwind compilation here...
+	CGO_ENABLED=0 GOOS=linux go build -o /${BINARY_NAME} 
+
+# ==================================================================================== #
+# DOCKER
+# ==================================================================================== #
+#
+## build: build the dev docker image
+.PHONY: build
+build/dev/image:
+	docker build -t ${BINARY_NAME}:${APP_VERSION} .
+
+## build/dev/image: build the dev docker image
+.PHONY: build/prod/image
+build/prod/image:
+	docker build -t ${BINARY_NAME}:multistage . -f Dockerfile.multistage 
