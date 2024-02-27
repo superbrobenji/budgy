@@ -14,7 +14,6 @@ type Category struct {
 	items    []*entity.Item
 }
 
-// TODO add all the budget functions
 func NewCategory(name string) (Category, error) {
 	nameValidationErr := nameValidation(name)
 	if nameValidationErr != nil {
@@ -64,7 +63,6 @@ func (c *Category) SetName(name string) error {
 }
 
 func (c *Category) AddItem(item *entity.Item) error {
-	//TODO update the budget based on amount on transaction
 	if c.category == nil || c.category.Budget == nil {
 		//lazy initialise if category does not exist
 		// c.category = &entity.Category{}
@@ -85,7 +83,6 @@ func (c *Category) GetItems() []*entity.Item {
 }
 
 func (c *Category) RemoveItem(itemToRemove *entity.Item) error {
-	//TODO update the budget based on amount on transaction
 	if c.category == nil || c.category.Budget == nil {
 		//lazy initialise if category does not exist
 		// c.category = &entity.Category{}
