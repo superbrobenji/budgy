@@ -99,8 +99,7 @@ push: tidy audit no-dirty
 
 ## production/deploy: deploy the application to production
 .PHONY: production/deploy
-production/deploy: confirm tidy audit no-dirty
-	build/prod/image
+production/deploy: confirm tidy audit no-dirty build/prod/image
 	# Include additional deployment steps here...
 	
 ## build/docker: build the application in docker
