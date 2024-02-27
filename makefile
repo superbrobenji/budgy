@@ -86,7 +86,7 @@ build:
 
 ## build/dev/image: build the dev docker image
 .PHONY: build/prod
-build/prod/image:
+build/prod:
 	docker compose build ${PROD_BACKEND} 
 
 # ==================================================================================== #
