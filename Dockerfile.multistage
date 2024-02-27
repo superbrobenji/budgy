@@ -31,5 +31,4 @@ USER appuser
 WORKDIR /
 COPY --from=build-stage /budgy /budgy
 EXPOSE 8080
-USER nonroot:nonroot
 ENTRYPOINT ["/budgy"]
