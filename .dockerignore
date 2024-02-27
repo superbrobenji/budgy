@@ -1,0 +1,5 @@
+#.dockerignore
+.env
+cdk.json
+readme.md
+.git
