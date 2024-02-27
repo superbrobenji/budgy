@@ -107,5 +107,5 @@ production/deploy: confirm tidy audit no-dirty build/prod
 .PHONY: build/docker
 build/docker:
     # Include additional build steps, like TypeScript, SCSS or Tailwind compilation here...
-	CGO_ENABLED=0 GOOS=linux go build -o /${BINARY_NAME} 
+	CGO_ENABLED=0 GOOS=linux go build -o /${BINARY_NAME} ${MAIN_PACKAGE_PATH}
 

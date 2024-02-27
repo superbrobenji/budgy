@@ -1,9 +1,26 @@
 package main
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/aws/aws-cdk-go/awscdk/v2"
+	"github.com/aws/jsii-runtime-go"
+	"github.com/superbrobenji/budgy/infrastructure/cdk"
+)
 
 func main() {
 
+	defer jsii.Close()
+
+	app := awscdk.NewApp(nil)
+
+	cdk.NewGoCdkStack(app, "GoCdkStack", &cdk.GoCdkStackProps{
+		StackProps: awscdk.StackProps{
+			Env: cdk.Env(),
+		},
+	})
+
+	app.Synth(nil)
 	// Create a new request multiplexer
 	// Take incoming requests and dispatch them to the matching handlers
 	mux := http.NewServeMux()

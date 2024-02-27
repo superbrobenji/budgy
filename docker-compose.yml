@@ -6,7 +6,7 @@ services:
       context: .
       target: dev
     volumes:
-      - .:/cmd
+      - .:/app
   backend_prod:
     image: budgy:prod
     build:
@@ -14,4 +14,4 @@ services:
       context: .
       target: release-stage
     volumes:
-      - .:/cmd
+      - .:/app
