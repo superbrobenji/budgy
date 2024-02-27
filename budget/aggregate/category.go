@@ -5,10 +5,11 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/superbrobenji/budgy/budget/model/entity"
+	valueobject "github.com/superbrobenji/budgy/budget/model/valueObject"
 )
 
 type Category struct {
-    //TODO possibly make the items aggregates
+	//TODO possibly make the items aggregates
 	category *entity.Category
 	items    []*entity.Item
 }
@@ -19,10 +20,16 @@ func NewCategory(name string) (Category, error) {
 	if nameValidationErr != nil {
 		return Category{}, nameValidationErr
 	}
+	budget := &valueobject.Budget{
+		Total:     0,
+		Spent:     0,
+		Remaining: 0,
+	}
 
 	category := &entity.Category{
-		Name: name,
-		ID:   uuid.New(),
+		Name:   name,
+		ID:     uuid.New(),
+		Budget: budget,
 	}
 	return Category{
 		category: category,
@@ -38,8 +45,12 @@ func (c *Category) GetName() string {
 	return c.category.Name
 }
 
+func (c *Category) GetBudget() *valueobject.Budget {
+	return c.category.Budget
+}
+
 func (c *Category) SetName(name string) error {
-	if c.category == nil {
+	if c.category == nil || c.category.Budget == nil {
 		//lazy initialise if category does not exist
 		// c.category = &entity.Category{}
 		return ErrUnInitialised
@@ -54,7 +65,7 @@ func (c *Category) SetName(name string) error {
 
 func (c *Category) AddItem(item *entity.Item) error {
 	//TODO update the budget based on amount on transaction
-	if c.category == nil {
+	if c.category == nil || c.category.Budget == nil {
 		//lazy initialise if category does not exist
 		// c.category = &entity.Category{}
 		return ErrUnInitialised
@@ -62,6 +73,9 @@ func (c *Category) AddItem(item *entity.Item) error {
 	if item == nil {
 		return ErrInvalidItem
 	}
+	c.category.Budget.Total += item.Budget.Total
+	c.category.Budget.Spent += item.Budget.Spent
+	c.category.Budget.Remaining = c.category.Budget.Total - c.category.Budget.Spent
 	c.items = append(c.items, item)
 	return nil
 }
@@ -72,7 +86,7 @@ func (c *Category) GetItems() []*entity.Item {
 
 func (c *Category) RemoveItem(itemToRemove *entity.Item) error {
 	//TODO update the budget based on amount on transaction
-	if c.category == nil {
+	if c.category == nil || c.category.Budget == nil {
 		//lazy initialise if category does not exist
 		// c.category = &entity.Category{}
 		return ErrUnInitialised
@@ -91,6 +105,9 @@ func (c *Category) RemoveItem(itemToRemove *entity.Item) error {
 	if indexToRemove == -1 {
 		return nil
 	}
+	c.category.Budget.Total -= itemToRemove.Budget.Total
+	c.category.Budget.Spent -= itemToRemove.Budget.Spent
+	c.category.Budget.Remaining = c.category.Budget.Total - c.category.Budget.Spent
 	c.items = append(c.items[:indexToRemove], c.items[indexToRemove+1:]...)
 	return nil
 }

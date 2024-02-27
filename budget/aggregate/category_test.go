@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/superbrobenji/budgy/budget/aggregate"
 	"github.com/superbrobenji/budgy/budget/model/entity"
+	valueobject "github.com/superbrobenji/budgy/budget/model/valueObject"
 )
 
 func TestCategory_NewCategory(t *testing.T) {
@@ -93,7 +94,7 @@ func TestCategory_SetName(t *testing.T) {
 			expectedErr: aggregate.ErrReservedCategoryNameSpace,
 		},
 		{
-			test:        "should return a customer when name is not empty",
+			test:        "should run successfully when name is not empty",
 			name:        "John",
 			expectedErr: nil,
 		},
@@ -115,6 +116,9 @@ func TestCategory_AddItem(t *testing.T) {
 		expectedValue []*entity.Item
 		expectedErr   error
 	}
+	var total float64 = 100
+	var spent float64 = 0
+	var remaining float64 = 100
 
 	category, error := aggregate.NewCategory("John")
 	if error != nil {
@@ -123,6 +127,11 @@ func TestCategory_AddItem(t *testing.T) {
 	item1 := &entity.Item{
 		Name: "John",
 		ID:   uuid.New(),
+		Budget: &valueobject.Budget{
+			Total:     total,
+			Spent:     spent,
+			Remaining: remaining,
+		},
 	}
 
 	testCases := []testCase{
@@ -150,6 +159,16 @@ func TestCategory_AddItem(t *testing.T) {
 			if !isEqual {
 				t.Errorf("expected value %v, got %v", tc.expectedValue, items)
 			}
+			budget := category.GetBudget()
+			if err == nil && budget.Total != total {
+				t.Errorf("expected value %v, got %v", total, budget.Total)
+			}
+			if err == nil && budget.Spent != spent {
+				t.Errorf("expected value %v, got %v", spent, budget.Spent)
+			}
+			if err == nil && budget.Remaining != remaining {
+				t.Errorf("expected value %v, got %v", remaining, budget.Remaining)
+			}
 		})
 	}
 }
@@ -161,18 +180,30 @@ func TestCategory_RemoveItem(t *testing.T) {
 		expectedValue []*entity.Item
 		expectedErr   error
 	}
+	budget1 := &valueobject.Budget{
+		Total:     100,
+		Spent:     50,
+		Remaining: 50,
+	}
+	budget2 := &valueobject.Budget{
+		Total:     200,
+		Spent:     0,
+		Remaining: 200,
+	}
 
 	category, error := aggregate.NewCategory("John")
 	if error != nil {
 		t.Fatalf("unexpected error %v", error)
 	}
 	item1 := &entity.Item{
-		Name: "John",
-		ID:   uuid.New(),
+		Name:   "John",
+		ID:     uuid.New(),
+		Budget: budget1,
 	}
 	item2 := &entity.Item{
-		Name: "Sam",
-		ID:   uuid.New(),
+		Name:   "Sam",
+		ID:     uuid.New(),
+		Budget: budget2,
 	}
 	err := category.AddItem(item1)
 	if err != nil {
@@ -207,6 +238,15 @@ func TestCategory_RemoveItem(t *testing.T) {
 			isEqual := equalItemSlices(items, tc.expectedValue)
 			if !isEqual {
 				t.Errorf("expected value %v, got %v", tc.expectedValue, items)
+			}
+			if err == nil && category.GetBudget().Total != 200 {
+				t.Errorf("expected value %v, got %v", 200, category.GetBudget().Total)
+			}
+			if err == nil && category.GetBudget().Spent != 0 {
+				t.Errorf("expected value %v, got %v", 0, category.GetBudget().Spent)
+			}
+			if err == nil && category.GetBudget().Remaining != 200 {
+				t.Errorf("expected value %v, got %v", 200, category.GetBudget().Remaining)
 			}
 		})
 	}

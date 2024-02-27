@@ -9,6 +9,6 @@ import (
 type Transaction struct {
 	ID     uuid.UUID
 	Name   string
-	Amount float32
+	Amount float64
 	Date   time.Time
 }

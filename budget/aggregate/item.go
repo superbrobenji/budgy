@@ -7,20 +7,27 @@ import (
 )
 
 type Item struct {
-    //TODO possibly make the transations aggregates
+	//TODO possibly make the transations aggregates
 	item         *entity.Item
 	transactions []*valueobject.Transaction
 }
 
-// TODO add all the budget functions
-func NewItem(name string) (Item, error) {
+func NewItem(name string, amount float64) (Item, error) {
 	if name == "" {
 		return Item{}, ErrInvalidName
+	}
+	if amount < 0 {
+		return Item{}, ErrInvalidAmount
 	}
 
 	item := &entity.Item{
 		Name: name,
 		ID:   uuid.New(),
+		Budget: &valueobject.Budget{
+			Total:     amount,
+			Spent:     0,
+			Remaining: amount,
+		},
 	}
 	return Item{
 		item:         item,
@@ -28,50 +35,68 @@ func NewItem(name string) (Item, error) {
 	}, nil
 }
 
-func (c *Item) GetID() uuid.UUID {
-	return c.item.ID
+func (i *Item) GetID() uuid.UUID {
+	return i.item.ID
 }
 
-func (c *Item) GetName() string {
-	return c.item.Name
+func (i *Item) GetName() string {
+	return i.item.Name
 }
 
-func (c *Item) SetName(name string) error {
-	if c.item == nil {
+func (i *Item) SetName(name string) error {
+	if i.item == nil || i.item.Budget == nil {
 		//lazy initialise if item does not exist
-		// c.item = &entity.Item{}
+		// i.item = &entity.Item{}
 		return ErrUnInitialised
 	}
 	if name == "" {
 		return ErrInvalidName
 	}
-	c.item.Name = name
+	i.item.Name = name
 	return nil
 }
 
-func (c *Item) AddTransaction(transaction *valueobject.Transaction) error {
-	//TODO update the budget based on amount on transaction
-	if c.item == nil {
+func (i *Item) GetBudget() *valueobject.Budget {
+	return i.item.Budget
+}
+
+func (i *Item) SetTotalBudget(amount float64) error {
+	if i.item == nil || i.item.Budget == nil {
 		//lazy initialise if item does not exist
-		// c.item = &entity.Item{}
+		// i.item = &entity.Item{}
+		return ErrUnInitialised
+	}
+	if amount < 0 {
+		return ErrInvalidAmount
+	}
+	i.item.Budget.Total = amount
+	i.item.Budget.Remaining = i.item.Budget.Total - i.item.Budget.Spent
+	return nil
+}
+
+func (i *Item) AddTransaction(transaction *valueobject.Transaction) error {
+	if i.item == nil || i.item.Budget == nil {
+		//lazy initialise if item does not exist
+		// i.item = &entity.Item{}
 		return ErrUnInitialised
 	}
 	if transaction == nil {
 		return ErrInvalidTransaction
 	}
-	c.transactions = append(c.transactions, transaction)
+	i.item.Budget.Spent += transaction.Amount
+	i.item.Budget.Remaining = i.item.Budget.Total - i.item.Budget.Spent
+	i.transactions = append(i.transactions, transaction)
 	return nil
 }
 
-func (c *Item) GetTransactions() []*valueobject.Transaction {
-	return c.transactions
+func (i *Item) GetTransactions() []*valueobject.Transaction {
+	return i.transactions
 }
 
-func (c *Item) RemoveTransation(transactionToRemove *valueobject.Transaction) error {
-	//TODO update the budget based on amount on transaction
-	if c.item == nil {
+func (i *Item) RemoveTransation(transactionToRemove *valueobject.Transaction) error {
+	if i.item == nil || i.item.Budget == nil {
 		//lazy initialise if item does not exist
-		// c.item = &entity.Item{}
+		// i.item = &entity.Item{}
 		return ErrUnInitialised
 	}
 	if transactionToRemove == nil {
@@ -79,7 +104,7 @@ func (c *Item) RemoveTransation(transactionToRemove *valueobject.Transaction) er
 	}
 
 	indexToRemove := -1
-	for i, item := range c.transactions {
+	for i, item := range i.transactions {
 		if item == transactionToRemove {
 			indexToRemove = i
 			break
@@ -88,6 +113,8 @@ func (c *Item) RemoveTransation(transactionToRemove *valueobject.Transaction) er
 	if indexToRemove == -1 {
 		return nil
 	}
-	c.transactions = append(c.transactions[:indexToRemove], c.transactions[indexToRemove+1:]...)
+	i.item.Budget.Spent -= transactionToRemove.Amount
+	i.item.Budget.Remaining = i.item.Budget.Total - i.item.Budget.Spent
+	i.transactions = append(i.transactions[:indexToRemove], i.transactions[indexToRemove+1:]...)
 	return nil
 }

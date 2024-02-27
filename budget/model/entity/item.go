@@ -6,7 +6,7 @@ import (
 )
 
 type Item struct {
-	ID   uuid.UUID
-	Name string
-	valueobject.Budget
+	ID     uuid.UUID
+	Name   string
+	Budget *valueobject.Budget
 }

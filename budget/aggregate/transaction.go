@@ -11,7 +11,7 @@ type Transaction struct {
 	transaction *valueobject.Transaction
 }
 
-func NewTransaction(name string, amount float32) (Transaction, error) {
+func NewTransaction(name string, amount float64) (Transaction, error) {
     if name == "" {
         return Transaction{}, ErrInvalidName
     }
@@ -37,6 +37,6 @@ func (t *Transaction)GetID() uuid.UUID {
 func (t *Transaction) GetName() string {
     return t.transaction.Name
 }
-func (t *Transaction) GetAmount() float32 {
+func (t *Transaction) GetAmount() float64 {
     return t.transaction.Amount
 }
