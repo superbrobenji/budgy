@@ -65,6 +65,7 @@ test/cover:
 .PHONY: run
 run: 
 	docker run -d --publish 8080:8080 --name ${BINARY_NAME}_${APP_VERSION} ${BINARY_NAME}:${APP_VERSION}
+
 ## run/live: run the applicatitn with reloading on file changes
 .PHONY: run/live
 run/live:
@@ -80,7 +81,7 @@ run/live:
 #
 ## build: build the dev docker image
 .PHONY: build
-build/dev/image:
+build:
 	docker build -t ${BINARY_NAME}:${APP_VERSION} .
 
 ## build/dev/image: build the dev docker image
