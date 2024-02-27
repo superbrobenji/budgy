@@ -63,7 +63,7 @@ test/cover:
 
 ## run: run the  application
 .PHONY: run
-run: 
+run: build 
 	docker run -d --publish 8080:8080 --name ${BINARY_NAME}_${APP_VERSION} ${BINARY_NAME}:${APP_VERSION}
 
 ## run/live: run the applicatitn with reloading on file changes
@@ -85,7 +85,7 @@ build:
 	docker build -t ${BINARY_NAME}:${APP_VERSION} .
 
 ## build/dev/image: build the dev docker image
-.PHONY: build/prod/image
+.PHONY: build/prod
 build/prod/image:
 	docker build -t ${BINARY_NAME}:multistage . -f Dockerfile.multistage 
 
@@ -100,7 +100,7 @@ push: tidy audit no-dirty
 
 ## production/deploy: deploy the application to production
 .PHONY: production/deploy
-production/deploy: confirm tidy audit no-dirty build/prod/image
+production/deploy: confirm tidy audit no-dirty build/prod
 	# Include additional deployment steps here...
 	
 ## build/docker: build the application in docker
