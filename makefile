@@ -74,6 +74,19 @@ run/live:
 		--build.include_ext "go, tpl, tmpl, html, css, scss, js, ts, sql, jpeg, jpg, gif, png, bmp, svg, webp, ico" \
 		--misc.clean_on_exit "true"
 
+# ==================================================================================== #
+# DOCKER
+# ==================================================================================== #
+#
+## build: build the dev docker image
+.PHONY: build
+build/dev/image:
+	docker build -t ${BINARY_NAME}:${APP_VERSION} .
+
+## build/dev/image: build the dev docker image
+.PHONY: build/prod/image
+build/prod/image:
+	docker build -t ${BINARY_NAME}:multistage . -f Dockerfile.multistage 
 
 # ==================================================================================== #
 # OPERATIONS
@@ -96,16 +109,3 @@ build/docker:
     # Include additional build steps, like TypeScript, SCSS or Tailwind compilation here...
 	CGO_ENABLED=0 GOOS=linux go build -o /${BINARY_NAME} 
 
-# ==================================================================================== #
-# DOCKER
-# ==================================================================================== #
-#
-## build: build the dev docker image
-.PHONY: build
-build/dev/image:
-	docker build -t ${BINARY_NAME}:${APP_VERSION} .
-
-## build/dev/image: build the dev docker image
-.PHONY: build/prod/image
-build/prod/image:
-	docker build -t ${BINARY_NAME}:multistage . -f Dockerfile.multistage 
