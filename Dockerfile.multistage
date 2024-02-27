@@ -20,7 +20,7 @@ CMD ["/budgy"]
 FROM build-stage AS test-stage
 RUN make test/race
 
-FROM gcr.io/distroless/base-debian11 AS release-stage
+FROM gcr.io/distroless/nodejs20-debian12 AS release-stage
 RUN apt-get update && apt-get install -y \
     software-properties-common \
     npm
