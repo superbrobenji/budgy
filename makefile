@@ -82,12 +82,12 @@ run/live:
 ## build: build the dev docker image
 .PHONY: build
 build:
-	docker compose build  
+	docker compose build ${DEV_BACKEND}
 
 ## build/dev/image: build the dev docker image
 .PHONY: build/prod
 build/prod/image:
-	docker compose build -f Dockerfile.multistage 
+	docker compose build ${PROD_BACKEND} 
 
 # ==================================================================================== #
 # OPERATIONS
@@ -95,12 +95,12 @@ build/prod/image:
 
 ## push: push changes to the remote Git repository
 .PHONY: push
-push: tidy 
+push: tidy audit no-dirty
 	git push
 
 ## production/deploy: deploy the application to production
 .PHONY: production/deploy
-production/deploy: confirm tidy audit no-dirty build/prod
+production/deploy: confirm tidy audit no-dirty build/prod 
 	# Include additional deployment steps here...
 	
 ## build/docker: build the application in docker

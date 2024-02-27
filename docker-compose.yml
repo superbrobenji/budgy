@@ -8,9 +8,9 @@ services:
     volumes:
       - .:/cmd
   backend_prod:
-    image: budgy:${VERSION}
+    image: budgy:${VERSION}:PROD
     build:
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.multistage
       context: .
       target: release-stage
     volumes:
