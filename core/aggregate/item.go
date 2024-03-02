@@ -10,9 +10,10 @@ type Item struct {
 	//TODO possibly make the transations aggregates
 	item         *entity.Item
 	transactions []*valueobject.Transaction
+    category *entity.Category
 }
 
-func NewItem(name string, amount float64) (Item, error) {
+func NewItem(name string, amount float64, category *entity.Category) (Item, error) {
 	if name == "" {
 		return Item{}, ErrInvalidName
 	}
@@ -32,6 +33,7 @@ func NewItem(name string, amount float64) (Item, error) {
 	return Item{
 		item:         item,
 		transactions: make([]*valueobject.Transaction, 0),
+        category: category,
 	}, nil
 }
 
@@ -58,6 +60,10 @@ func (i *Item) SetName(name string) error {
 
 func (i *Item) GetBudget() *valueobject.Budget {
 	return i.item.Budget
+}
+
+func (i *Item) GetParentCategory() *entity.Category {
+    return i.category
 }
 
 func (i *Item) SetTotalBudget(amount float64) error {

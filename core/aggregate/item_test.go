@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/superbrobenji/budgy/core/aggregate"
+	"github.com/superbrobenji/budgy/core/model/entity"
 	valueobject "github.com/superbrobenji/budgy/core/model/valueObject"
 )
 
@@ -15,6 +16,15 @@ func TestItem_NewItem(t *testing.T) {
 		name        string
 		budget      float64
 		expectedErr error
+	}
+	category := &entity.Category{
+		ID:   uuid.New(),
+		Name: "John",
+		Budget: &valueobject.Budget{
+			Total:     100,
+			Spent:     0,
+			Remaining: 100,
+		},
 	}
 	testCases := []testCase{
 		{
@@ -32,7 +42,7 @@ func TestItem_NewItem(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.test, func(t *testing.T) {
-			_, err := aggregate.NewItem(tc.name, tc.budget)
+			_, err := aggregate.NewItem(tc.name, tc.budget, category)
 			if err != tc.expectedErr {
 				t.Errorf("expected error %v, got %v", tc.expectedErr, err)
 			}
@@ -46,7 +56,16 @@ func TestItem_SetName(t *testing.T) {
 		name        string
 		expectedErr error
 	}
-	item, error := aggregate.NewItem("John", 100)
+	category := &entity.Category{
+		ID:   uuid.New(),
+		Name: "John",
+		Budget: &valueobject.Budget{
+			Total:     100,
+			Spent:     0,
+			Remaining: 100,
+		},
+	}
+	item, error := aggregate.NewItem("John", 100, category)
 	if error != nil {
 		t.Fatalf("unexpected error %v", error)
 	}
@@ -79,10 +98,19 @@ func TestItem_AddTransaction(t *testing.T) {
 		expectedValue []*valueobject.Transaction
 		expectedErr   error
 	}
+	category := &entity.Category{
+		ID:   uuid.New(),
+		Name: "John",
+		Budget: &valueobject.Budget{
+			Total:     100,
+			Spent:     0,
+			Remaining: 100,
+		},
+	}
 	var startVal float64 = 100
 	var updateVal float64 = 100
 
-	item, error := aggregate.NewItem("John", startVal)
+	item, error := aggregate.NewItem("John", startVal, category)
 	if error != nil {
 		t.Fatalf("unexpected error %v", error)
 	}
@@ -139,8 +167,17 @@ func TestItem_RemoveTransaction(t *testing.T) {
 	var startVal float64 = 200
 	var val1 float64 = 100
 	var val2 float64 = 50
+	category := &entity.Category{
+		ID:   uuid.New(),
+		Name: "John",
+		Budget: &valueobject.Budget{
+			Total:     100,
+			Spent:     0,
+			Remaining: 100,
+		},
+	}
 
-	items, error := aggregate.NewItem("John", startVal)
+	items, error := aggregate.NewItem("John", startVal, category)
 	if error != nil {
 		t.Fatalf("unexpected error %v", error)
 	}
@@ -208,8 +245,17 @@ func TestItem_SetTotalBudget(t *testing.T) {
 	}
 	var startVal float64 = 100
 	var updateVal float64 = 200
+	category := &entity.Category{
+		ID:   uuid.New(),
+		Name: "John",
+		Budget: &valueobject.Budget{
+			Total:     100,
+			Spent:     0,
+			Remaining: 100,
+		},
+	}
 
-	item, error := aggregate.NewItem("John", startVal)
+	item, error := aggregate.NewItem("John", startVal, category)
 	if error != nil {
 		t.Fatalf("unexpected error %v", error)
 	}

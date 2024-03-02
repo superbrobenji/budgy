@@ -4,14 +4,16 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/superbrobenji/budgy/core/model/entity"
 	valueobject "github.com/superbrobenji/budgy/core/model/valueObject"
 )
 
 type Transaction struct {
 	transaction *valueobject.Transaction
+	item        *entity.Item
 }
 
-func NewTransaction(name string, amount float64) (Transaction, error) {
+func NewTransaction(name string, amount float64, item *entity.Item) (Transaction, error) {
 	if name == "" {
 		return Transaction{}, ErrInvalidName
 	}
@@ -27,7 +29,11 @@ func NewTransaction(name string, amount float64) (Transaction, error) {
 	}
 	return Transaction{
 		transaction: transaction,
+		item:        item,
 	}, nil
+}
+func (t *Transaction) GetParentItem() *entity.Item {
+	return t.item
 }
 
 func (t *Transaction) GetID() uuid.UUID {

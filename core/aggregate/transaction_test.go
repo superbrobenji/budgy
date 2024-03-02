@@ -3,7 +3,10 @@ package aggregate_test
 import (
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/superbrobenji/budgy/core/aggregate"
+	"github.com/superbrobenji/budgy/core/model/entity"
+	valueobject "github.com/superbrobenji/budgy/core/model/valueObject"
 )
 
 func TestTransaction_NewTransaction(t *testing.T) {
@@ -12,6 +15,15 @@ func TestTransaction_NewTransaction(t *testing.T) {
 		name        string
 		amount      float64
 		expectedErr error
+	}
+	item := &entity.Item{
+		ID:   uuid.New(),
+		Name: "John",
+		Budget: &valueobject.Budget{
+			Total:     100,
+			Spent:     0,
+			Remaining: 100,
+		},
 	}
 	testCases := []testCase{
 		{
@@ -35,7 +47,7 @@ func TestTransaction_NewTransaction(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.test, func(t *testing.T) {
-			_, err := aggregate.NewTransaction(tc.name, tc.amount)
+			_, err := aggregate.NewTransaction(tc.name, tc.amount, item)
 			if err != tc.expectedErr {
 				t.Errorf("expected error %v, got %v", tc.expectedErr, err)
 			}

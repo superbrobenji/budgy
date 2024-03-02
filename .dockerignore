@@ -1,5 +1,5 @@
 #.dockerignore
+**/infrastructure/cdk
 .env
-cdk.json
 readme.md
 .git
