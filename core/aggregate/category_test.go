@@ -4,9 +4,9 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/superbrobenji/budgy/budget/aggregate"
-	"github.com/superbrobenji/budgy/budget/model/entity"
-	valueobject "github.com/superbrobenji/budgy/budget/model/valueObject"
+	"github.com/superbrobenji/budgy/core/aggregate"
+	"github.com/superbrobenji/budgy/core/model/entity"
+	valueobject "github.com/superbrobenji/budgy/core/model/valueObject"
 )
 
 func TestCategory_NewCategory(t *testing.T) {

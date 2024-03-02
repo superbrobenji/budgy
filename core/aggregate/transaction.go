@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	valueobject "github.com/superbrobenji/budgy/budget/model/valueObject"
+	valueobject "github.com/superbrobenji/budgy/core/model/valueObject"
 )
 
 type Transaction struct {

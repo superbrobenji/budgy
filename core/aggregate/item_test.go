@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/superbrobenji/budgy/budget/aggregate"
-	valueobject "github.com/superbrobenji/budgy/budget/model/valueObject"
+	"github.com/superbrobenji/budgy/core/aggregate"
+	valueobject "github.com/superbrobenji/budgy/core/model/valueObject"
 )
 
 func TestItem_NewItem(t *testing.T) {

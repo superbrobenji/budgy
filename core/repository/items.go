@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
-	"github.com/superbrobenji/budgy/budget/aggregate"
+	"github.com/superbrobenji/budgy/core/aggregate"
 )
 
 var (

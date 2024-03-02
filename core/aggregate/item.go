@@ -2,8 +2,8 @@ package aggregate
 
 import (
 	"github.com/google/uuid"
-	"github.com/superbrobenji/budgy/budget/model/entity"
-	valueobject "github.com/superbrobenji/budgy/budget/model/valueObject"
+	"github.com/superbrobenji/budgy/core/model/entity"
+	valueobject "github.com/superbrobenji/budgy/core/model/valueObject"
 )
 
 type Item struct {

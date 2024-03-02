@@ -3,7 +3,7 @@ package aggregate_test
 import (
 	"testing"
 
-	"github.com/superbrobenji/budgy/budget/aggregate"
+	"github.com/superbrobenji/budgy/core/aggregate"
 )
 
 func TestTransaction_NewTransaction(t *testing.T) {
