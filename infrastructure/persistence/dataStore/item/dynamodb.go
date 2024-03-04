@@ -11,12 +11,12 @@ type DynamoItemRepository struct {
 }
 
 type dynamoItem struct {
-	ID           string   `json:"id"`
-	Name         string   `json:"name"`
-	Transactions []string `json:"transactions"`
-	Total        float64  `json:"total"`
-	Spent        float64  `json:"spent"`
-	CategoryID   string   `json:"category_id"`
+	ID           string   `dynamodbav:"id"`
+	Name         string   `dynamodbav:"name"`
+	Transactions []string `dynamodbav:"transactions"`
+	Total        float64  `dynamodbav:"total"`
+	Spent        float64  `dynamodbav:"spent"`
+	CategoryID   string   `dynamodbav:"category_id"`
 }
 
 func NewDynamoItem(item *aggregate.Item) dynamoItem {
@@ -37,6 +37,7 @@ func NewDynamoItem(item *aggregate.Item) dynamoItem {
 // TOOD create logger to track errors
 // TODO create proper error handling
 func NewAggregateItem(item *dynamoItem) (aggregate.Item, error) {
+	var error error = nil
 	categoryID, _ := uuid.Parse(item.CategoryID)
 	itemID, _ := uuid.Parse(item.ID)
 	uuidTransactions := make([]uuid.UUID, 0)
@@ -44,9 +45,19 @@ func NewAggregateItem(item *dynamoItem) (aggregate.Item, error) {
 		uuidTransaction, _ := uuid.Parse(transactionID)
 		uuidTransactions = append(uuidTransactions, uuidTransaction)
 	}
-	newItem, _ := aggregate.NewItem(item.Name, item.Total, categoryID)
-	newItem.SetID(itemID)
-	newItem.SetBudgetSpent(item.Spent)
-	newItem.SetTransactionIDs(uuidTransactions)
+	newItem, error := aggregate.NewItem(item.Name, item.Total, categoryID)
+	error = newItem.SetID(itemID)
+	error = newItem.SetBudgetSpent(item.Spent)
+	error = newItem.SetTransactionIDs(uuidTransactions)
+    if error != nil {
+        return aggregate.Item{}, error
+    }
 	return newItem, nil
 }
+//TODO functions:
+// - GetItemsByCategoryID
+// - GetItemByID
+// - PutItem
+// - DeleteItem
+// - UpdateItem
+// - GetItemsByDate (range)

@@ -15,8 +15,9 @@ var (
 )
 
 type CategoryRepository interface {
-	Get(uuid.UUID) (aggregate.Category, error)
-	Add(aggregate.Category) error
-	Update(aggregate.Category) error
-	Delete(uuid.UUID) error
+	GetCategoryByID(uuid.UUID) (aggregate.Category, error)
+    GetCategoryByItemID(uuid.UUID) (aggregate.Category, error)
+	PutCategory(aggregate.Category) error
+	UpdateCategory(aggregate.Category) error
+	DeleteCategory(uuid.UUID) error
 }

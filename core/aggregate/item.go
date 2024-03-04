@@ -116,6 +116,15 @@ func (i *Item) SetBudgetSpent(amount float64) error {
 func (i *Item) GetTransactionIDs() []uuid.UUID {
 	return i.transactionIDs
 }
+func (i *Item) SetTransactionIDs(transactionIDs []uuid.UUID) error {
+    if i.item == nil {
+        //lazy initialise if item does not exist
+        // i.item = &entity.Item{}
+        return ErrUnInitialised
+    }
+    i.transactionIDs = transactionIDs
+    return nil
+}
 func (i *Item) AddTransaction(transaction *Transaction) error {
 	if i.item == nil || i.item.Budget == nil {
 		//lazy initialise if item does not exist

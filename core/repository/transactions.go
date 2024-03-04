@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/superbrobenji/budgy/core/aggregate"
@@ -14,7 +15,9 @@ var (
 )
 
 type TransactionRepository interface {
-	Get(uuid.UUID) (aggregate.Category, error)
-	Add(aggregate.Category) error
-	Delete(uuid.UUID) error
+	GetTransactionsByItemID(uuid.UUID) (aggregate.Category, error)
+	GetTransactionsByDate(time.Time, time.Time) error
+    GetTransactionByID(uuid.UUID) error
+    PutTransaction(aggregate.Transaction) error
+	DeleteTransaction(uuid.UUID) error
 }

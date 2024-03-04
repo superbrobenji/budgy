@@ -1,5 +1,5 @@
 #.dockerignore
 **/cdk
-.env
 readme.md
 .git
+.gitignore

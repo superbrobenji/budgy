@@ -1,6 +1,8 @@
 services:
   backend_dev:
     image: budgy:${VERSION}
+    env_file:
+      - .env
     build:
       dockerfile: Dockerfile
       context: .
