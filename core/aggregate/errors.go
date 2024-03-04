@@ -9,4 +9,5 @@ var (
 	ErrInvalidItem               = errors.New("a valid item must be supplied")
 	ErrInvalidTransaction        = errors.New("a valid transaction must be supplied")
 	ErrInvalidAmount             = errors.New("a valid positive amount must be supplied")
+	ErrInvalidBudget             = errors.New("a valid budget must be supplied")
 )

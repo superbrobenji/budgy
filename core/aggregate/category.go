@@ -11,7 +11,7 @@ import (
 type Category struct {
 	//TODO possibly make the items aggregates
 	category *entity.Category
-	items    []*entity.Item
+	itemIDs  []uuid.UUID
 }
 
 func NewCategory(name string) (Category, error) {
@@ -32,12 +32,21 @@ func NewCategory(name string) (Category, error) {
 	}
 	return Category{
 		category: category,
-		items:    make([]*entity.Item, 0),
+		itemIDs:  make([]uuid.UUID, 0),
 	}, nil
 }
 
 func (c *Category) GetID() uuid.UUID {
 	return c.category.ID
+}
+func (c *Category) SetID(id uuid.UUID) error {
+	if c.category == nil {
+		//lazy initialise if category does not exist
+		// c.category = &entity.Category{}
+		return ErrUnInitialised
+	}
+	c.category.ID = id
+	return nil
 }
 
 func (c *Category) GetName() string {
@@ -47,9 +56,38 @@ func (c *Category) GetName() string {
 func (c *Category) GetBudget() *valueobject.Budget {
 	return c.category.Budget
 }
+func (c *Category) SetBudgetTotal(total float64) error {
+	if c.category == nil {
+		//lazy initialise if category does not exist
+		// c.category = &entity.Category{}
+		return ErrUnInitialised
+	}
+	if c.category.Budget == nil {
+		//lazy initialise if budget does not exist
+		c.category.Budget = &valueobject.Budget{}
+	}
+	c.category.Budget.Total = total
+    c.category.Budget.Remaining = total - c.category.Budget.Spent
+	return nil
+}
+
+func (c *Category) SetBudgetSpent(spent float64) error {
+    if c.category == nil {
+        //lazy initialise if category does not exist
+        // c.category = &entity.Category{}
+        return ErrUnInitialised
+    }
+    if c.category.Budget == nil {
+        //lazy initialise if budget does not exist
+        c.category.Budget = &valueobject.Budget{}
+    }
+    c.category.Budget.Spent = spent
+    c.category.Budget.Remaining = c.category.Budget.Total - spent
+    return nil
+}
 
 func (c *Category) SetName(name string) error {
-	if c.category == nil || c.category.Budget == nil {
+	if c.category == nil {
 		//lazy initialise if category does not exist
 		// c.category = &entity.Category{}
 		return ErrUnInitialised
@@ -62,7 +100,7 @@ func (c *Category) SetName(name string) error {
 	return nil
 }
 
-func (c *Category) AddItem(item *entity.Item) error {
+func (c *Category) AddItem(item *Item) error {
 	if c.category == nil || c.category.Budget == nil {
 		//lazy initialise if category does not exist
 		// c.category = &entity.Category{}
@@ -71,18 +109,33 @@ func (c *Category) AddItem(item *entity.Item) error {
 	if item == nil {
 		return ErrInvalidItem
 	}
-	c.category.Budget.Total += item.Budget.Total
-	c.category.Budget.Spent += item.Budget.Spent
+	for _, itemID := range c.itemIDs {
+		if itemID == item.GetID() {
+			return nil
+		}
+	}
+	budget := item.GetBudget()
+	c.category.Budget.Total += budget.Total
+	c.category.Budget.Spent += budget.Spent
 	c.category.Budget.Remaining = c.category.Budget.Total - c.category.Budget.Spent
-	c.items = append(c.items, item)
+	c.itemIDs = append(c.itemIDs, item.GetID())
 	return nil
 }
 
-func (c *Category) GetItems() []*entity.Item {
-	return c.items
+func (c *Category) GetItemIDs() []uuid.UUID {
+	return c.itemIDs
+}
+func (c *Category) SetItemIDs(itemIDs []uuid.UUID) error {
+    if c.category == nil {
+        //lazy initialise if category does not exist
+        // c.category = &entity.Category{}
+        return ErrUnInitialised
+    }
+    c.itemIDs = itemIDs
+    return nil
 }
 
-func (c *Category) RemoveItem(itemToRemove *entity.Item) error {
+func (c *Category) RemoveItem(itemToRemove *Item) error {
 	if c.category == nil || c.category.Budget == nil {
 		//lazy initialise if category does not exist
 		// c.category = &entity.Category{}
@@ -93,8 +146,8 @@ func (c *Category) RemoveItem(itemToRemove *entity.Item) error {
 	}
 
 	indexToRemove := -1
-	for i, item := range c.items {
-		if item == itemToRemove {
+	for i, itemID := range c.itemIDs {
+		if itemID == itemToRemove.GetID() {
 			indexToRemove = i
 			break
 		}
@@ -102,10 +155,11 @@ func (c *Category) RemoveItem(itemToRemove *entity.Item) error {
 	if indexToRemove == -1 {
 		return nil
 	}
-	c.category.Budget.Total -= itemToRemove.Budget.Total
-	c.category.Budget.Spent -= itemToRemove.Budget.Spent
+	budget := itemToRemove.GetBudget()
+	c.category.Budget.Total -= budget.Total
+	c.category.Budget.Spent -= budget.Spent
 	c.category.Budget.Remaining = c.category.Budget.Total - c.category.Budget.Spent
-	c.items = append(c.items[:indexToRemove], c.items[indexToRemove+1:]...)
+	c.itemIDs = append(c.itemIDs[:indexToRemove], c.itemIDs[indexToRemove+1:]...)
 	return nil
 }
 

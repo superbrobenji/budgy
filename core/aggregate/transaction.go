@@ -4,16 +4,15 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/superbrobenji/budgy/core/model/entity"
 	valueobject "github.com/superbrobenji/budgy/core/model/valueObject"
 )
 
 type Transaction struct {
 	transaction *valueobject.Transaction
-	item        *entity.Item
+	itemID      uuid.UUID
 }
 
-func NewTransaction(name string, amount float64, item *entity.Item) (Transaction, error) {
+func NewTransaction(name string, date time.Time, amount float64, itemID uuid.UUID) (Transaction, error) {
 	if name == "" {
 		return Transaction{}, ErrInvalidName
 	}
@@ -25,15 +24,24 @@ func NewTransaction(name string, amount float64, item *entity.Item) (Transaction
 		Name:   name,
 		Amount: amount,
 		ID:     uuid.New(),
-		Date:   time.Now(),
+		Date:   date,
 	}
 	return Transaction{
 		transaction: transaction,
-		item:        item,
+		itemID:      itemID,
 	}, nil
 }
-func (t *Transaction) GetParentItem() *entity.Item {
-	return t.item
+func (t *Transaction) SetID(id uuid.UUID) error {
+	if t.transaction == nil {
+		//lazy initialise if transaction does not exist
+		// t.transaction = &valueobject.Transaction{}
+		return ErrUnInitialised
+	}
+	t.transaction.ID = id
+	return nil
+}
+func (t *Transaction) GetParentItemID() uuid.UUID {
+	return t.itemID
 }
 
 func (t *Transaction) GetID() uuid.UUID {
@@ -45,4 +53,10 @@ func (t *Transaction) GetName() string {
 }
 func (t *Transaction) GetAmount() float64 {
 	return t.transaction.Amount
+}
+func (t *Transaction) GetDate() time.Time {
+	return t.transaction.Date
+}
+func (t *Transaction) GetItemID() uuid.UUID {
+	return t.itemID
 }
