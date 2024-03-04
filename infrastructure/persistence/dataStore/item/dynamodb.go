@@ -60,4 +60,3 @@ func NewAggregateItem(item *dynamoItem) (aggregate.Item, error) {
 // - PutItem
 // - DeleteItem
 // - UpdateItem
-// - GetItemsByDate (range)
