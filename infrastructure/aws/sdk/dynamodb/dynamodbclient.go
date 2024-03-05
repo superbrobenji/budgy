@@ -17,27 +17,27 @@ var dynamodbClient *dynamodb.Client
 var onceDdbClient sync.Once
 
 func getAwsConfig() aws.Config {
-  onceAwsConfig.Do(func() {
-    var err error
-    awsConfig, err = awsConfigMod.LoadDefaultConfig(context.TODO())
-    if err != nil {
-      panic(err)
-    }
-  })
+	onceAwsConfig.Do(func() {
+		var err error
+		awsConfig, err = awsConfigMod.LoadDefaultConfig(context.TODO())
+		if err != nil {
+			panic(err)
+		}
+	})
 
-  return awsConfig
+	return awsConfig
 }
 
 func GetDynamodbClient() *dynamodb.Client {
-  onceDdbClient.Do(func() {
-    awsConfig = getAwsConfig()
+	onceDdbClient.Do(func() {
+		awsConfig = getAwsConfig()
 
-    region := os.Getenv("AWS_REGION")
+		region := os.Getenv("AWS_REGION")
 
-    dynamodbClient = dynamodb.NewFromConfig(awsConfig, func(opt *dynamodb.Options) {
-      opt.Region = region
-    })
-  })
+		dynamodbClient = dynamodb.NewFromConfig(awsConfig, func(opt *dynamodb.Options) {
+			opt.Region = region
+		})
+	})
 
-  return dynamodbClient
+	return dynamodbClient
 }

@@ -48,11 +48,11 @@ func NewAggregateTransaction(transaction *dynamoTransaction) (aggregate.Transact
 	if transaction == nil {
 		return aggregate.Transaction{}, ErrNoDynamoObject
 	}
-    intTime, err := strconv.ParseInt(transaction.Date, 10, 64)
-    if err != nil {
-        return aggregate.Transaction{}, err
-    }
-    timeCreated := time.Unix(intTime, 0)
+	intTime, err := strconv.ParseInt(transaction.Date, 10, 64)
+	if err != nil {
+		return aggregate.Transaction{}, err
+	}
+	timeCreated := time.Unix(intTime, 0)
 
 	timeCreated, errorParsingTime := time.Parse("2021-11-22", transaction.Date)
 	if errorParsingTime != nil {
@@ -143,40 +143,40 @@ func (dtr *DynamoTransactionRepository) GetTransactionsByItemID(id uuid.UUID) (*
 
 // TODO update to only update the fields that have changed
 func (dtr *DynamoTransactionRepository) UpdateTransaction(transaction *aggregate.Transaction) error {
-    dynamoTransaction, errorCreatingDynamoTransaction := NewDynamoTransaction(transaction)
-    if errorCreatingDynamoTransaction != nil {
-        return errorCreatingDynamoTransaction
-    }
+	dynamoTransaction, errorCreatingDynamoTransaction := NewDynamoTransaction(transaction)
+	if errorCreatingDynamoTransaction != nil {
+		return errorCreatingDynamoTransaction
+	}
 
-    var update expression.UpdateBuilder
-    values := reflect.ValueOf(dynamoTransaction)
-    types := reflect.TypeOf(dynamoTransaction)
-    for i := 0; i < values.NumField(); i++ {
-        update = update.Set(expression.Name(types.Field(i).Name), expression.Value(values.Field(i)))
-    }
-    _, err := dtr.db.DynamodbUpdateWrapper(&sdk.KeyBasedStruct{Id: transaction.GetID().String()}, update, "transactions")
-    if err != nil {
-        return err
-    }
-    return nil
+	var update expression.UpdateBuilder
+	values := reflect.ValueOf(dynamoTransaction)
+	types := reflect.TypeOf(dynamoTransaction)
+	for i := 0; i < values.NumField(); i++ {
+		update = update.Set(expression.Name(types.Field(i).Name), expression.Value(values.Field(i)))
+	}
+	_, err := dtr.db.DynamodbUpdateWrapper(&sdk.KeyBasedStruct{Id: transaction.GetID().String()}, update, "transactions")
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (dtr *DynamoTransactionRepository) DeleteTransaction(id uuid.UUID) error {
-    key := &sdk.KeyBasedStruct{
-        Id: id.String(),
-    }
-    _, err := dtr.db.DynamodbDeleteWrapper(key, "transactions")
-    if err != nil {
-        return err
-    }
-    return nil
+	key := &sdk.KeyBasedStruct{
+		Id: id.String(),
+	}
+	_, err := dtr.db.DynamodbDeleteWrapper(key, "transactions")
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (dtr *DynamoTransactionRepository) GetTransactionsByDate(startDate time.Time, endDate time.Time) (*[]*aggregate.Transaction, error) {
-    unixStart := startDate.Unix()
-    unixEnd := endDate.Unix()
-    startValExp := expression.Value(unixStart)
-    endValExp := expression.Value(unixEnd)
+	unixStart := startDate.Unix()
+	unixEnd := endDate.Unix()
+	startValExp := expression.Value(unixStart)
+	endValExp := expression.Value(unixEnd)
 	var query expression.KeyConditionBuilder
 	query = expression.Key("date").Between(startValExp, endValExp)
 	dbItems := []dynamoTransaction{}

@@ -67,23 +67,23 @@ func (c *Category) SetBudgetTotal(total float64) error {
 		c.category.Budget = &valueobject.Budget{}
 	}
 	c.category.Budget.Total = total
-    c.category.Budget.Remaining = total - c.category.Budget.Spent
+	c.category.Budget.Remaining = total - c.category.Budget.Spent
 	return nil
 }
 
 func (c *Category) SetBudgetSpent(spent float64) error {
-    if c.category == nil {
-        //lazy initialise if category does not exist
-        // c.category = &entity.Category{}
-        return ErrUnInitialised
-    }
-    if c.category.Budget == nil {
-        //lazy initialise if budget does not exist
-        c.category.Budget = &valueobject.Budget{}
-    }
-    c.category.Budget.Spent = spent
-    c.category.Budget.Remaining = c.category.Budget.Total - spent
-    return nil
+	if c.category == nil {
+		//lazy initialise if category does not exist
+		// c.category = &entity.Category{}
+		return ErrUnInitialised
+	}
+	if c.category.Budget == nil {
+		//lazy initialise if budget does not exist
+		c.category.Budget = &valueobject.Budget{}
+	}
+	c.category.Budget.Spent = spent
+	c.category.Budget.Remaining = c.category.Budget.Total - spent
+	return nil
 }
 
 func (c *Category) SetName(name string) error {
@@ -126,13 +126,13 @@ func (c *Category) GetItemIDs() []uuid.UUID {
 	return c.itemIDs
 }
 func (c *Category) SetItemIDs(itemIDs []uuid.UUID) error {
-    if c.category == nil {
-        //lazy initialise if category does not exist
-        // c.category = &entity.Category{}
-        return ErrUnInitialised
-    }
-    c.itemIDs = itemIDs
-    return nil
+	if c.category == nil {
+		//lazy initialise if category does not exist
+		// c.category = &entity.Category{}
+		return ErrUnInitialised
+	}
+	c.itemIDs = itemIDs
+	return nil
 }
 
 func (c *Category) RemoveItem(itemToRemove *Item) error {

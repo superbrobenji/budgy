@@ -31,11 +31,11 @@ type categoryHandler struct{}
 func (h *categoryHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	category, _ := aggregate.NewCategory("Groceries")
 	database := categoryDatastore.NewDynamoCategoryRepository()
-    err := database.CreateCategory(&category)
-    if err != nil {
-        fmt.Println(err)
-        w.Write([]byte("Error creating category"))
-        return
-    }
-    w.Write([]byte("This is the category page"))
+	err := database.CreateCategory(&category)
+	if err != nil {
+		fmt.Println(err)
+		w.Write([]byte("Error creating category"))
+		return
+	}
+	w.Write([]byte("This is the category page"))
 }

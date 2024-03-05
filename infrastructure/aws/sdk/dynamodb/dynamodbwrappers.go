@@ -11,22 +11,22 @@ import (
 )
 
 type DynamodbClient struct {
-    db *dynamodb.Client
+	db *dynamodb.Client
 }
 type KeyBasedStruct struct {
-	Id          string `dynamodbav:"Id"`
+	Id string `dynamodbav:"Id"`
 }
 
 func NewDynamodbClient() *DynamodbClient {
-    return &DynamodbClient{
-        db: GetDynamodbClient(),
-    }
+	return &DynamodbClient{
+		db: GetDynamodbClient(),
+	}
 }
 
 func (ddbClient *DynamodbClient) DynamodbPutWrapper(item interface{}, conditionExp *string, table string) (*dynamodb.PutItemOutput, error) {
-    fmt.Println(item)
+	fmt.Println(item)
 	av, marshalErr := attributevalue.MarshalMap(item)
-    fmt.Println(av)
+	fmt.Println(av)
 	if marshalErr != nil {
 		return &dynamodb.PutItemOutput{}, marshalErr
 	}
@@ -64,13 +64,13 @@ func (ddbClient *DynamodbClient) DynamodbGetWrapper(key interface{}, resultItem 
 	return getItemRes, nil
 }
 func (ddbClient *DynamodbClient) DynamodbQueryWrapper(query expression.KeyConditionBuilder, resultItem interface{}, table string) (*dynamodb.QueryOutput, error) {
-    expr, builderErr := expression.NewBuilder().WithKeyCondition(query).Build()
-    if builderErr != nil {
-        return &dynamodb.QueryOutput{}, builderErr
-    }
+	expr, builderErr := expression.NewBuilder().WithKeyCondition(query).Build()
+	if builderErr != nil {
+		return &dynamodb.QueryOutput{}, builderErr
+	}
 
 	getItemRes, getItemErr := ddbClient.db.Query(context.TODO(), &dynamodb.QueryInput{
-		TableName: aws.String(table),
+		TableName:              aws.String(table),
 		KeyConditionExpression: expr.KeyCondition(),
 	})
 

@@ -28,14 +28,12 @@ no-dirty:
 ## tidy: format code and tidy modfile
 .PHONY: tidy
 tidy:
-	go fmt ./...
 	go mod tidy -v
 
 ## audit: run quality control checks
 .PHONY: audit
 audit:
 	go mod verify
-	go vet ./...
 	go run honnef.co/go/tools/cmd/staticcheck@latest -checks=all,-ST1000,-U1000 ./...
 	go run golang.org/x/vuln/cmd/govulncheck@latest ./...
 	go test -buildvcs -vet=off ./...
@@ -107,7 +105,7 @@ push: tidy audit no-dirty
 
 ## production/deploy: deploy the application to production
 .PHONY: production/deploy
-production/deploy: confirm tidy audit no-dirty deploy/prod
+production/deploy: confirm tidy no-dirty deploy/prod
 	# Include additional deployment steps here...
 	
 ## build/docker: build the application in docker

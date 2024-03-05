@@ -16,7 +16,7 @@ var (
 
 type CategoryRepository interface {
 	GetCategoryByID(uuid.UUID) (aggregate.Category, error)
-    GetCategoryByItemID(uuid.UUID) (aggregate.Category, error)
+	GetCategoryByItemID(uuid.UUID) (aggregate.Category, error)
 	PutCategory(aggregate.Category) error
 	UpdateCategory(aggregate.Category) error
 	DeleteCategory(uuid.UUID) error

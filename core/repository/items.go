@@ -19,5 +19,5 @@ type ItemRepository interface {
 	GetItemByID(uuid.UUID) error
 	PutItem(aggregate.Item) error
 	DeleteItem(uuid.UUID) error
-    UpdateItem(aggregate.Item) error
+	UpdateItem(aggregate.Item) error
 }

@@ -97,33 +97,33 @@ func (i *Item) SetBudgetTotal(amount float64) error {
 	return nil
 }
 func (i *Item) SetBudgetSpent(amount float64) error {
-    if i.item == nil {
-        //lazy initialise if item does not exist
-        // i.item = &entity.Item{}
-        return ErrUnInitialised
-    }
-    if i.item.Budget == nil {
-        i.item.Budget = &valueobject.Budget{}
-    }
-    if amount < 0 {
-        return ErrInvalidAmount
-    }
-    i.item.Budget.Spent = amount
-    i.item.Budget.Remaining = i.item.Budget.Total - i.item.Budget.Spent
-    return nil
+	if i.item == nil {
+		//lazy initialise if item does not exist
+		// i.item = &entity.Item{}
+		return ErrUnInitialised
+	}
+	if i.item.Budget == nil {
+		i.item.Budget = &valueobject.Budget{}
+	}
+	if amount < 0 {
+		return ErrInvalidAmount
+	}
+	i.item.Budget.Spent = amount
+	i.item.Budget.Remaining = i.item.Budget.Total - i.item.Budget.Spent
+	return nil
 }
 
 func (i *Item) GetTransactionIDs() []uuid.UUID {
 	return i.transactionIDs
 }
 func (i *Item) SetTransactionIDs(transactionIDs []uuid.UUID) error {
-    if i.item == nil {
-        //lazy initialise if item does not exist
-        // i.item = &entity.Item{}
-        return ErrUnInitialised
-    }
-    i.transactionIDs = transactionIDs
-    return nil
+	if i.item == nil {
+		//lazy initialise if item does not exist
+		// i.item = &entity.Item{}
+		return ErrUnInitialised
+	}
+	i.transactionIDs = transactionIDs
+	return nil
 }
 func (i *Item) AddTransaction(transaction *Transaction) error {
 	if i.item == nil || i.item.Budget == nil {
