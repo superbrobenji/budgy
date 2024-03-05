@@ -1,6 +1,8 @@
 #.dockerignore
+## Ignore everything
 **
 
+## Allow specific files
 !.dockerignore
 !Dockerfile
 !docker-compose.yml
@@ -14,5 +16,5 @@
 !infrastructure/persistence/**
 !infrastructure/transport/**
 
-
+## Ignore specific files inside allowed directories
 infrastructure/aws/cdk/**
