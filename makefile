@@ -84,18 +84,21 @@ run/live:
 build:
 	docker compose build ${DEV_BACKEND}
 
-## build/dev/image: build the dev docker image
-.PHONY: build/prod
-build/prod:
-	docker compose build ${PROD_BACKEND} 
 
 ## prune: remove all stopped containers and unused images
 .PHONY: prune
 prune:
-	docker system prune -y
+	docker system prune -f
 # ==================================================================================== #
 # OPERATIONS
 # ==================================================================================== #
+#
+## deploy/prod:  deploy the application to production
+.PHONY: deploy/prod
+build/prod:
+	cd ./infrastructure/aws/cdk
+	npm run build
+	cdk deploy
 
 ## push: push changes to the remote Git repository
 .PHONY: push
@@ -104,7 +107,7 @@ push: tidy audit no-dirty
 
 ## production/deploy: deploy the application to production
 .PHONY: production/deploy
-production/deploy: confirm tidy audit no-dirty build/prod 
+production/deploy: confirm tidy audit no-dirty deploy/prod
 	# Include additional deployment steps here...
 	
 ## build/docker: build the application in docker
