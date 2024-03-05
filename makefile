@@ -94,9 +94,7 @@ prune:
 ## deploy/prod:  deploy the application to production
 .PHONY: deploy/prod
 deploy/prod:
-	cd ./infrastructure/aws/cdk
-	npm run build
-	cdk deploy
+	cd ./infrastructure/aws/cdk; npm run build; cdk deploy
 
 ## push: push changes to the remote Git repository
 .PHONY: push
