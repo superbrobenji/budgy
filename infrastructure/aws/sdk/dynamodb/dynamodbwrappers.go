@@ -63,6 +63,27 @@ func (ddbClient *DynamodbClient) DynamodbGetWrapper(key interface{}, resultItem 
 
 	return getItemRes, nil
 }
+func (ddbClient *DynamodbClient) DynamodbQueryWrapper(query expression.KeyConditionBuilder, resultItem interface{}, table string) (*dynamodb.QueryOutput, error) {
+    expr, builderErr := expression.NewBuilder().WithKeyCondition(query).Build()
+    if builderErr != nil {
+        return &dynamodb.QueryOutput{}, builderErr
+    }
+
+	getItemRes, getItemErr := ddbClient.db.Query(context.TODO(), &dynamodb.QueryInput{
+		TableName: aws.String(table),
+		KeyConditionExpression: expr.KeyCondition(),
+	})
+
+	if getItemErr != nil {
+		return &dynamodb.QueryOutput{}, getItemErr
+	}
+	unmarshalErr := attributevalue.UnmarshalListOfMaps(getItemRes.Items, resultItem)
+	if unmarshalErr != nil {
+		return &dynamodb.QueryOutput{}, unmarshalErr
+	}
+
+	return getItemRes, nil
+}
 
 func (ddbClient *DynamodbClient) DynamodbUpdateWrapper(key interface{}, update expression.UpdateBuilder, table string) (*dynamodb.UpdateItemOutput, error) {
 	av, marshalErr := attributevalue.MarshalMap(key)

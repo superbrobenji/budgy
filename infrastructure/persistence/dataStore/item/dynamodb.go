@@ -2,10 +2,12 @@ package datastore
 
 import (
 	"errors"
+	"reflect"
 
-	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
 	"github.com/google/uuid"
 	"github.com/superbrobenji/budgy/core/aggregate"
+	sdk "github.com/superbrobenji/budgy/infrastructure/aws/sdk/dynamodb"
 )
 
 var (
@@ -15,7 +17,7 @@ var (
 )
 
 type DynamoItemRepository struct {
-	db *dynamodb.Client
+	db *sdk.DynamodbClient
 }
 
 type dynamoItem struct {
@@ -25,6 +27,9 @@ type dynamoItem struct {
 	Total        float64  `dynamodbav:"total"`
 	Spent        float64  `dynamodbav:"spent"`
 	CategoryID   string   `dynamodbav:"category_id"`
+}
+type CategoryKeyBasedStruct struct {
+	CategoryID string `dynamodbav:"category_id"`
 }
 
 func NewDynamoItem(item *aggregate.Item) (dynamoItem, error) {
@@ -94,9 +99,84 @@ func NewAggregateItem(item *dynamoItem) (aggregate.Item, error) {
 	return newItem, nil
 }
 
-//TODO functions:
-// - GetItemsByCategoryID
-// - GetItemByID
-// - PutItem
-// - DeleteItem
-// - UpdateItem
+func NewDynamoItemRepository() *DynamoItemRepository {
+	return &DynamoItemRepository{
+		db: sdk.NewDynamodbClient(),
+	}
+}
+
+func (dir *DynamoItemRepository) CreateItem(item *aggregate.Item) error {
+	dynamoItem, errorCreatingDynamoItem := NewDynamoItem(item)
+	if errorCreatingDynamoItem != nil {
+		return errorCreatingDynamoItem
+	}
+
+	_, errorPuttingItem := dir.db.DynamodbPutWrapper(dynamoItem, nil, "items")
+	if errorPuttingItem != nil {
+		return errorPuttingItem
+	}
+
+	return nil
+}
+
+func (dir *DynamoItemRepository) GetItemByID(id uuid.UUID) (*aggregate.Item, error) {
+	key := &sdk.KeyBasedStruct{
+		Id: id.String(),
+	}
+	result := &dynamoItem{}
+	_, err := dir.db.DynamodbGetWrapper(key, result, "items")
+	if err != nil {
+		return &aggregate.Item{}, err
+	}
+	aggregateItem, err := NewAggregateItem(result)
+	if err != nil {
+		return &aggregate.Item{}, err
+	}
+
+	return &aggregateItem, nil
+}
+func (dir *DynamoItemRepository) UpdateItem(item *aggregate.Item) error {
+	dynamoItem, err := NewDynamoItem(item)
+	if err != nil {
+		return err
+	}
+	var update expression.UpdateBuilder
+	values := reflect.ValueOf(dynamoItem)
+	types := reflect.TypeOf(dynamoItem)
+	for i := 0; i < values.NumField(); i++ {
+		update = update.Set(expression.Name(types.Field(i).Name), expression.Value(values.Field(i)))
+	}
+	_, err = dir.db.DynamodbUpdateWrapper(&sdk.KeyBasedStruct{Id: item.GetID().String()}, update, "items")
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func (dir *DynamoItemRepository) DeleteItem(id uuid.UUID) error {
+	key := &sdk.KeyBasedStruct{
+		Id: id.String(),
+	}
+	_, err := dir.db.DynamodbDeleteWrapper(key, "items")
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func (dir *DynamoItemRepository) GetItemsByCategoryID(categoryID uuid.UUID) (*[]*aggregate.Item, error) {
+	var query expression.KeyConditionBuilder
+	query = expression.Key("category_id").Equal(expression.Value(categoryID.String()))
+	dbItems := []dynamoItem{}
+	_, err := dir.db.DynamodbQueryWrapper(query, &dbItems, "items")
+	if err != nil {
+		return &[]*aggregate.Item{}, err
+	}
+	items := make([]*aggregate.Item, len(dbItems), 0)
+	for index, dbItem := range dbItems {
+		item, err := NewAggregateItem(&dbItem)
+		if err != nil {
+			return &[]*aggregate.Item{}, err
+		}
+		items[index] = &item
+	}
+	return &items, nil
+}
