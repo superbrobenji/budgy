@@ -1,20 +1,7 @@
 #.dockerignore
-## Ignore everything
-**
+**/cdk/**/*
+/readme.md
+/.git/**
+/.gitignore
+/.env
 
-## Allow specific files
-!.dockerignore
-!Dockerfile
-!docker-compose.yml
-!Dockerfile.multistage
-!go.mod
-!go.sum
-!cmd/**
-!core/**
-!makefile
-!infrastructure/aws/sdk/**
-!infrastructure/persistence/**
-!infrastructure/transport/**
-
-## Ignore specific files inside allowed directories
-infrastructure/aws/cdk/**
