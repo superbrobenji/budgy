@@ -31,10 +31,17 @@ export class BudgyStack extends cdk.Stack {
         });
 
         //ECS Fargate
+        const buildSecrets = {
+            'VERSION': cdk.DockerBuildSecret.fromSrc('.env'),
+            'AWS_ACCESS_KEY_ID': cdk.DockerBuildSecret.fromSrc('.env'),
+            'AWS_SECRET_ACCESS_KEY': cdk.DockerBuildSecret.fromSrc('.env'),
+            'AWS_REGION': cdk.DockerBuildSecret.fromSrc('.env'),
+        }
         const image = new DockerImageAsset(this, "BackendImage", {
             directory: join(__dirname, "..", "..", "..", ".."),
             file: "Dockerfile.multistage",
-            target: "release-stage"
+            target: "release-stage",
+            buildSecrets,
         });
         const vpc = new ec2.Vpc(this, "MyVpc", {
             maxAzs: 3 // Default is all AZs in region

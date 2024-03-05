@@ -62,7 +62,7 @@ test/cover:
 ## run: run the  application
 .PHONY: run
 run: build prune
-	docker compose run -p 8080:8080 --name ${BINARY_NAME} ${DEV_BACKEND}
+	docker compose run -p 8080:8080 --name ${BINARY_NAME} ${DEV_BACKEND} 
 
 ## run/live: run the applicatitn with reloading on file changes
 .PHONY: run/live
