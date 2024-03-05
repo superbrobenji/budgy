@@ -2,6 +2,7 @@ package sdk
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
@@ -9,18 +10,28 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 )
 
+type DynamodbClient struct {
+    db *dynamodb.Client
+}
 type KeyBasedStruct struct {
-	Id string `dynamodbav:"id"`
+	Id          string `dynamodbav:"Id"`
 }
 
-func DynamodbPutWrapper(item interface{}, conditionExp *string, table string) (*dynamodb.PutItemOutput, error) {
-	ddbClient := GetDynamodbClient()
+func NewDynamodbClient() *DynamodbClient {
+    return &DynamodbClient{
+        db: GetDynamodbClient(),
+    }
+}
+
+func (ddbClient *DynamodbClient) DynamodbPutWrapper(item interface{}, conditionExp *string, table string) (*dynamodb.PutItemOutput, error) {
+    fmt.Println(item)
 	av, marshalErr := attributevalue.MarshalMap(item)
+    fmt.Println(av)
 	if marshalErr != nil {
 		return &dynamodb.PutItemOutput{}, marshalErr
 	}
 
-	putItemRes, putItemErr := ddbClient.PutItem(context.TODO(), &dynamodb.PutItemInput{
+	putItemRes, putItemErr := ddbClient.db.PutItem(context.TODO(), &dynamodb.PutItemInput{
 		TableName:           aws.String(table),
 		Item:                av,
 		ConditionExpression: conditionExp,
@@ -32,14 +43,13 @@ func DynamodbPutWrapper(item interface{}, conditionExp *string, table string) (*
 	return putItemRes, nil
 }
 
-func DynamodbGetWrapper(key interface{}, resultItem interface{}, table string) (*dynamodb.GetItemOutput, error) {
-	ddbClient := GetDynamodbClient()
+func (ddbClient *DynamodbClient) DynamodbGetWrapper(key interface{}, resultItem interface{}, table string) (*dynamodb.GetItemOutput, error) {
 	av, marshalErr := attributevalue.MarshalMap(key)
 	if marshalErr != nil {
 		return &dynamodb.GetItemOutput{}, marshalErr
 	}
 
-	getItemRes, getItemErr := ddbClient.GetItem(context.TODO(), &dynamodb.GetItemInput{
+	getItemRes, getItemErr := ddbClient.db.GetItem(context.TODO(), &dynamodb.GetItemInput{
 		TableName: aws.String(table),
 		Key:       av,
 	})
@@ -54,8 +64,7 @@ func DynamodbGetWrapper(key interface{}, resultItem interface{}, table string) (
 	return getItemRes, nil
 }
 
-func DynamodbUpdateWrapper(key interface{}, update expression.UpdateBuilder, table string) (*dynamodb.UpdateItemOutput, error) {
-	ddbClient := GetDynamodbClient()
+func (ddbClient *DynamodbClient) DynamodbUpdateWrapper(key interface{}, update expression.UpdateBuilder, table string) (*dynamodb.UpdateItemOutput, error) {
 	av, marshalErr := attributevalue.MarshalMap(key)
 	if marshalErr != nil {
 		return &dynamodb.UpdateItemOutput{}, marshalErr
@@ -66,7 +75,7 @@ func DynamodbUpdateWrapper(key interface{}, update expression.UpdateBuilder, tab
 		return &dynamodb.UpdateItemOutput{}, builderErr
 	}
 
-	updateItemRes, updateItemErr := ddbClient.UpdateItem(context.TODO(), &dynamodb.UpdateItemInput{
+	updateItemRes, updateItemErr := ddbClient.db.UpdateItem(context.TODO(), &dynamodb.UpdateItemInput{
 		TableName:                 aws.String(table),
 		Key:                       av,
 		UpdateExpression:          expr.Update(),
@@ -80,14 +89,13 @@ func DynamodbUpdateWrapper(key interface{}, update expression.UpdateBuilder, tab
 	return updateItemRes, nil
 }
 
-func DynamodbDeleteWrapper(key interface{}, table string) (*dynamodb.DeleteItemOutput, error) {
-	ddbClient := GetDynamodbClient()
+func (ddbClient *DynamodbClient) DynamodbDeleteWrapper(key interface{}, table string) (*dynamodb.DeleteItemOutput, error) {
 	av, marshalErr := attributevalue.MarshalMap(key)
 	if marshalErr != nil {
 		return &dynamodb.DeleteItemOutput{}, marshalErr
 	}
 
-	deleteItemRes, deleteItemErr := ddbClient.DeleteItem(context.TODO(), &dynamodb.DeleteItemInput{
+	deleteItemRes, deleteItemErr := ddbClient.db.DeleteItem(context.TODO(), &dynamodb.DeleteItemInput{
 		TableName: aws.String(table),
 		Key:       av,
 	})

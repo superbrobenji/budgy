@@ -1,6 +1,8 @@
 package transport
 
-import "net/http"
+import (
+	"net/http"
+)
 
 func NewServer() (mux *http.ServeMux) {
 	// Create a new request multiplexer
@@ -16,5 +18,5 @@ func NewServer() (mux *http.ServeMux) {
 type homeHandler struct{}
 
 func (h *homeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-    w.Write([]byte("This is my home page"))
+	w.Write([]byte("This is my home page"))
 }

@@ -63,8 +63,8 @@ test/cover:
 
 ## run: run the  application
 .PHONY: run
-run: build 
-	docker compose run -d -p 8080:8080 --name ${BINARY_NAME} ${DEV_BACKEND}
+run: build prune
+	docker compose run -p 8080:8080 --name ${BINARY_NAME} ${DEV_BACKEND}
 
 ## run/live: run the applicatitn with reloading on file changes
 .PHONY: run/live
@@ -89,6 +89,10 @@ build:
 build/prod:
 	docker compose build ${PROD_BACKEND} 
 
+## prune: remove all stopped containers and unused images
+.PHONY: prune
+prune:
+	docker system prune -y
 # ==================================================================================== #
 # OPERATIONS
 # ==================================================================================== #
