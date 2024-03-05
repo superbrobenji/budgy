@@ -47,11 +47,7 @@ export class BudgyStack extends cdk.Stack {
         // Create a load-balanced Fargate service and make it public
         new ecs_patterns.ApplicationLoadBalancedFargateService(this, "MyFargateService", {
             cluster: cluster, // Required
-            cpu: 512, // Default is 256
-            desiredCount: 1, // Default is 1
             taskImageOptions: { image: ecs.ContainerImage.fromDockerImageAsset(image) },
-            memoryLimitMiB: 512, // Default is 512
-            publicLoadBalancer: true // Default is true
         });
     }
 }
