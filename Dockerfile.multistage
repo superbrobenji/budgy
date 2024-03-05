@@ -11,14 +11,7 @@ RUN npm install npm@latest -g && \
     n latest
 
 WORKDIR /app
-COPY cmd/ ./cmd/
-COPY core/ ./core/
-COPY infrastructure/aws/sdk/ ./infrastructure/aws/sdk/
-COPY infrastructure/persistence/ ./infrastructure/persistence/
-COPY infrastructure/transport/ ./infrastructure/transport/
-COPY go.sum ./
-COPY go.mod ./
-COPY makefile ./
+COPY  . ./
 RUN go mod download
 RUN make build/docker
 EXPOSE 8080
