@@ -63,6 +63,11 @@ test/cover:
 .PHONY: run
 run: build prune
 	docker compose run -p 8080:8080 --name ${BINARY_NAME} ${DEV_BACKEND} 
+	
+## run: run the  application
+.PHONY: run/prod
+run/prod: build/prod prune
+	docker compose run -p 8080:8080 --name ${BINARY_NAME} ${PROD_BACKEND} 
 
 ## run/live: run the applicatitn with reloading on file changes
 .PHONY: run/live
@@ -82,6 +87,11 @@ run/live:
 build:
 	docker compose build ${DEV_BACKEND}
 
+## build/prod: build the prod docker image
+.PHONY: build/prod
+build/prod:
+	docker compose build ${PROD_BACKEND}
+
 
 ## prune: remove all stopped containers and unused images
 .PHONY: prune
@@ -91,10 +101,6 @@ prune:
 # OPERATIONS
 # ==================================================================================== #
 #
-## deploy/prod:  deploy the application to production
-.PHONY: deploy/prod
-deploy/prod:
-	cd ./infrastructure/aws/cdk; npm run build; cdk deploy
 
 ## push: push changes to the remote Git repository
 .PHONY: push
@@ -112,3 +118,16 @@ build/docker:
     # Include additional build steps, like TypeScript, SCSS or Tailwind compilation here...
 	CGO_ENABLED=0 GOOS=linux go build -o /${BINARY_NAME} ${MAIN_PACKAGE_PATH}
 
+# ==================================================================================== #
+# AWS CDK
+# ==================================================================================== #
+#
+## deploy/prod:  deploy the application to production
+.PHONY: deploy/prod
+deploy/prod:
+	cd ./infrastructure/aws/cdk; npm run build; cdk deploy
+
+## destroy/prod: destroy the application in production
+.PHONY: destroy/prod
+destroy/prod:
+	cd ./infrastructure/aws/cdk; cdk destroy
