@@ -17,7 +17,7 @@ var (
 type ItemRepository interface {
 	GetItemsByCategoryID(uuid.UUID) (aggregate.Category, error)
 	GetItemByID(uuid.UUID) error
-	PutItem(aggregate.Item) error
+	CreateItem(aggregate.Item) error
 	DeleteItem(uuid.UUID) error
 	UpdateItem(aggregate.Item) error
 }

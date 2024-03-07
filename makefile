@@ -125,7 +125,7 @@ build/docker:
 ## deploy/prod:  deploy the application to production
 .PHONY: deploy/prod
 deploy/prod:
-	cd ./infrastructure/aws/cdk; npm run build; cdk deploy
+	cd ./infrastructure/aws/cdk; npm run build; cdk synth; cdk deploy
 
 ## destroy/prod: destroy the application in production
 .PHONY: destroy/prod

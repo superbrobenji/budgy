@@ -18,6 +18,6 @@ type TransactionRepository interface {
 	GetTransactionsByItemID(uuid.UUID) (aggregate.Category, error)
 	GetTransactionsByDate(time.Time, time.Time) error
 	GetTransactionByID(uuid.UUID) error
-	PutTransaction(aggregate.Transaction) error
+	CreateTransaction(aggregate.Transaction) error
 	DeleteTransaction(uuid.UUID) error
 }
