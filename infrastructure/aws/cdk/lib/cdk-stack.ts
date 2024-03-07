@@ -38,7 +38,7 @@ export class BudgyStack extends Stack {
         const { fileNames, directories } = getFileNamesAndDirectories(lambdaPath);
         for (let i = 0; i < fileNames.length; i++) {
             const lambdaFunc = new go.GoFunction(this, fileNames[i], {
-                entry: path.join(directories[i], fileNames[i]),
+                entry: path.join(directories[i]),
                 bundling: {
                     environment: {
                         TABLE_NAME: this.table.tableName

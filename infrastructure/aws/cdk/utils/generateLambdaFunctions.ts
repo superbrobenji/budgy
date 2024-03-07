@@ -7,7 +7,7 @@ const getFileNamesAndDirectories = (dir: string): { fileNames: string[], directo
     for (const directory of lambdaDirectories) {
         const filesInDirectory = readdirSync(path.join(dir, directory));
         const file = filesInDirectory[0];
-        const filePath = path.join(dir, path.join(directory, file));
+        const filePath = path.join(dir, directory );
 
         const fileNameLowerCase = file.split('.')[0];
         const fileName = fileNameLowerCase.charAt(0).toUpperCase() + fileNameLowerCase.slice(1);
