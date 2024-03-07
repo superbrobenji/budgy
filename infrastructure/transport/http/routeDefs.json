@@ -1,0 +1,12 @@
+[
+  {
+    "route": "/",
+    "method": "GET",
+    "service": "createTransactionTest"
+  },
+  {
+    "route": "/api/",
+    "method": "GET",
+    "service": "readItemTest"
+  }
+]
