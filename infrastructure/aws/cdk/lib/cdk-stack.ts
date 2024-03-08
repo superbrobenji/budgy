@@ -61,7 +61,7 @@ export class BudgyStack extends Stack {
             }
         }
         //lambda functions factory
-        const baseApiPath = process.env.ROUTE_API_ENDPOINT || '/api' + "/" + process.env.VERSION || 'v1';
+        const baseApiPath = process.env.ROUTE_API_ENDPOINT + "/" + process.env.VERSION;
         console.log('baseApiPath', baseApiPath);
         const lambdaPath = path.join(__dirname, '..', '..', '..', 'transport', 'http', 'lambdaHandlers');
         const { fileNames, directories } = getFileNamesAndDirectories(lambdaPath);
