@@ -1,3 +1,4 @@
+// Depricated: This file is no longer used. It was used to start the server before but moved to a microservice architecture
 package main
 
 import (

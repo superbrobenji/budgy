@@ -28,12 +28,14 @@ no-dirty:
 ## tidy: format code and tidy modfile
 .PHONY: tidy
 tidy:
+	go fmt ./...
 	go mod tidy -v
 
 ## audit: run quality control checks
 .PHONY: audit
 audit:
 	go mod verify
+	go vet ./...
 	go run honnef.co/go/tools/cmd/staticcheck@latest -checks=all,-ST1000,-U1000 ./...
 	go run golang.org/x/vuln/cmd/govulncheck@latest ./...
 	go test -buildvcs -vet=off ./...
@@ -44,7 +46,7 @@ audit:
 # ==================================================================================== #
 
 ## test: run all tests
-.PHONY: test
+.PHONY:test
 test:
 	go test -v -buildvcs ./...
 
@@ -59,17 +61,17 @@ test/cover:
 	go test -v -race -buildvcs -coverprofile=/tmp/coverage.out ./...
 	go tool cover -html=/tmp/coverage.out
 
-## run: run the  application
+## run: DEPRICATED run the  application
 .PHONY: run
 run: build prune
 	docker compose run -p 8080:8080 --name ${BINARY_NAME} ${DEV_BACKEND} 
 	
-## run: run the  application
+## run: DEPRICATED run the  application
 .PHONY: run/prod
 run/prod: build/prod prune
 	docker compose run -p 8080:8080 --name ${BINARY_NAME} ${PROD_BACKEND} 
 
-## run/live: run the applicatitn with reloading on file changes
+## run/live: DEPRICATED run the applicatitn with reloading on file changes
 .PHONY: run/live
 run/live:
 	go run github.com/cosmtrek/air@v1.43.0 \
@@ -82,18 +84,18 @@ run/live:
 # DOCKER
 # ==================================================================================== #
 #
-## build: build the dev docker image
+## build: DEPRICATED build the dev docker image
 .PHONY: build
 build:
 	docker compose build ${DEV_BACKEND}
 
-## build/prod: build the prod docker image
+## build/prod: DEPRICATED build the prod docker image
 .PHONY: build/prod
 build/prod:
 	docker compose build ${PROD_BACKEND}
 
 
-## prune: remove all stopped containers and unused images
+## prune: DEPRICATED remove all stopped containers and unused images
 .PHONY: prune
 prune:
 	docker system prune -f
@@ -112,7 +114,7 @@ push: tidy audit no-dirty
 production/deploy: confirm tidy no-dirty deploy/prod
 	# Include additional deployment steps here...
 	
-## build/docker: build the application in docker
+## build/docker: DEPRICATED build the application in docker
 .PHONY: build/docker
 build/docker:
     # Include additional build steps, like TypeScript, SCSS or Tailwind compilation here...
@@ -122,10 +124,10 @@ build/docker:
 # AWS CDK
 # ==================================================================================== #
 #
-## deploy/prod:  deploy the application to production
+## deploy/prod: deploy the application to production
 .PHONY: deploy/prod
 deploy/prod:
-	cd ./infrastructure/aws/cdk; npm run build; cdk synth; cdk deploy
+	cd ./infrastructure/aws/cdk; npm run build; cdk deploy
 
 ## destroy/prod: destroy the application in production
 .PHONY: destroy/prod

@@ -1,4 +1,5 @@
 # syntax=docker/dockerfile:1
+## DEPRECATED
 
 FROM golang:1.21.6 as dev
 

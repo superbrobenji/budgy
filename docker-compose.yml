@@ -1,3 +1,4 @@
+#DEPRICATED
 services:
   backend_dev:
     image: budgy:${VERSION}
