@@ -5,7 +5,12 @@ import { BudgyStack } from '../lib/cdk-stack';
 
 dotenv.config()
 const app = new cdk.App();
-new BudgyStack(app, `BudgyStack${process.env.VERSION}`, {
+if (!process.env.VERSION) {
+  throw new Error('VERSION environment variable is required')
+}
+const version = process.env.VERSION.charAt(0).toUpperCase() + process.env.VERSION.slice(1)
+const dashedVersion = version.replace('.', '-')
+new BudgyStack(app, `BudgyStack${dashedVersion}`, {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */
