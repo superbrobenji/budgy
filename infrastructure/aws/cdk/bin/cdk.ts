@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 import * as cdk from 'aws-cdk-lib';
+import * as dotenv from 'dotenv'
 import { BudgyStack } from '../lib/cdk-stack';
 
+dotenv.config()
 const app = new cdk.App();
 console.log(process.env.VERSION)
 console.log(process.env.AWS_ACCOUNT)
