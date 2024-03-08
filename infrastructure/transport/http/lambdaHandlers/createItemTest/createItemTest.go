@@ -1,9 +1,10 @@
-package services
+package main
 
 import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/google/uuid"
 	"github.com/superbrobenji/budgy/core/aggregate"
+	services "github.com/superbrobenji/budgy/core/service/createItemTest"
 )
 
 type book struct {
@@ -13,7 +14,7 @@ type book struct {
 }
 
 func getItems() (*aggregate.Item, error) {
-	itemService, err := NewItemService()
+	itemService, err := services.NewItemService()
 	if err != nil {
 		return nil, err
 	}

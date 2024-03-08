@@ -60,7 +60,7 @@ export class BudgyStack extends Stack {
         }
         //lambda functions factory
         const baseApiPath = process.env.ROUTE_API_ENDPOINT || '/api' + "/" + process.env.VERSION || 'v1';
-        const lambdaPath = path.join(__dirname, '..', '..', '..', '..', 'core', 'service');
+        const lambdaPath = path.join(__dirname, '..', '..', '..', 'transport', 'http', 'lambdaHandlers');
         const { fileNames, directories } = getFileNamesAndDirectories(lambdaPath);
         for (let i = 0; i < fileNames.length; i++) {
             const lambdaFunc = new go.GoFunction(this, fileNames[i], {
@@ -75,7 +75,7 @@ export class BudgyStack extends Stack {
             // API Gateway route factory
             for (const routeDef of routeDefs) {
                 const serviceName = path.basename(directories[i]);
-                if (routeDef.service === serviceName) {
+                if (routeDef.handler === serviceName) {
                     const route = routeDef.route;
                     const method = methodFactory(routeDef.method)
                     const lambdaInegration = new HttpLambdaIntegration(fileNames[i], lambdaFunc);

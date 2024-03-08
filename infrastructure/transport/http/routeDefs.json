@@ -2,6 +2,6 @@
   {
     "route": "/createItemTest",
     "method": "GET",
-    "service": "createItemTest"
+    "handler": "createItemTest"
   }
 ]
