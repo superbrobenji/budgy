@@ -5,8 +5,8 @@
     "service": "createTransactionTest"
   },
   {
-    "route": "/api/",
+    "route": "/api",
     "method": "GET",
-    "service": "readItemTest"
+    "service": "readItemsTest"
   }
 ]

@@ -5,8 +5,9 @@ import * as go from '@aws-cdk/aws-lambda-go-alpha';
 import getFileNamesAndDirectories from '../utils/generateLambdaFunctions';
 import * as routeDefs from '../../../transport/http/routeDefs.json'
 import path = require('path');
-import { CfnIntegration, CfnRoute, HttpApi } from 'aws-cdk-lib/aws-apigatewayv2';
+import { CfnIntegration, CfnRoute, HttpApi, HttpMethod } from 'aws-cdk-lib/aws-apigatewayv2';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import { HttpLambdaIntegration } from 'aws-cdk-lib/aws-apigatewayv2-integrations';
 //import * as ecs from 'aws-cdk-lib/aws-ecs';
 //import * as ecs_patterns from 'aws-cdk-lib/aws-ecs-patterns';
 //import { DockerImageAsset } from 'aws-cdk-lib/aws-ecr-assets';
@@ -36,6 +37,28 @@ export class BudgyStack extends Stack {
             tableName: 'transactions'
         });
 
+        // API Gateway
+        const httpApi = new HttpApi(this, 'BudgyHttpApi', {
+            apiName: 'BudgyApi',
+            description: 'This is the Budgy API',
+        });
+
+        // Lambda functions
+        const methodFactory = (method: string) => {
+            switch (method) {
+                case 'GET':
+                    return HttpMethod.GET;
+                case 'POST':
+                    return HttpMethod.POST;
+                case 'PUT':
+                    return HttpMethod.PUT;
+                case 'DELETE':
+                    return HttpMethod.DELETE;
+                default:
+                    return HttpMethod.ANY;
+            }
+        }
+        //lambda functions factory
         const lambdaPath = path.join(__dirname, '..', '..', '..', '..', 'core', 'service', 'lambda');
         const { fileNames, directories } = getFileNamesAndDirectories(lambdaPath);
         for (let i = 0; i < fileNames.length; i++) {
@@ -48,39 +71,19 @@ export class BudgyStack extends Stack {
                 }
             });
             this.table.grantReadWriteData(lambdaFunc);
+            // API Gateway route factory
             for (const routeDef of routeDefs) {
-                if (routeDef.service === fileNames[i]) {
+                const serviceName = fileNames[i].charAt(0).toLowerCase() + fileNames[i].slice(1);
+                if (routeDef.service === serviceName) {
                     const route = routeDef.route;
-                    const method = routeDef.method;
-                    const vpc = new ec2.Vpc(this, "MyVpc", {
-                        maxAzs: 3 // Default is all AZs in region
+                    const method = methodFactory(routeDef.method)
+                    const lambdaInegration = new HttpLambdaIntegration(fileNames[i], lambdaFunc);
+                    httpApi.addRoutes({
+                        path: route,
+                        methods: [method],
+                        integration: lambdaInegration,
                     });
-                    const httpVpcLink = new CfnResource(this, 'HttpVpcLink', {
-                        type: 'AWS::ApiGatewayV2::VpcLink',
-                        properties: {
-                            Name: 'V2 VPC Link',
-                            SubnetIds: vpc.privateSubnets.map(m => m.subnetId)
-                        }
-                    });
-                    const httpApi = new HttpApi(this, 'HttpApiGateway', {
-                        apiName: 'ApigwFargate',
-                        description: 'Integration between apigw and Application Load-Balanced Fargate Service',
-                    });
-                    const integration = new CfnIntegration(this, 'HttpApiGatewayIntegration', {
-                        apiId: httpApi.httpApiId,
-                        connectionId: httpVpcLink.ref,
-                        connectionType: 'VPC_LINK',
-                        description: 'API Integration with AWS Fargate Service',
-                        integrationMethod: method, // for GET and POST, use ANY
-                        integrationType: 'HTTP_PROXY',
-                        integrationUri: lambdaFunc.functionArn,
-                        payloadFormatVersion: '1.0', // supported values for Lambda proxy integrations are 1.0 and 2.0. For all other integrations, 1.0 is the only supported value
-                    });
-                    new CfnRoute(this, 'Route', {
-                        apiId: httpApi.httpApiId,
-                        routeKey: route,  // for something more general use 'ANY /{proxy+}'
-                        target: `integrations/${integration.ref}`,
-                    });
+
                 }
             }
         }
