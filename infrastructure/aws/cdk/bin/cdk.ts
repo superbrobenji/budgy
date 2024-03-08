@@ -1,9 +1,10 @@
 #!/usr/bin/env node
-import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { BudgyStack } from '../lib/cdk-stack';
 
 const app = new cdk.App();
+console.log(process.env.VERSION)
+console.log(process.env.AWS_ACCOUNT)
 new BudgyStack(app, `BudgyStack${process.env.VERSION}`, {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
