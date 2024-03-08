@@ -34,15 +34,15 @@ func withDynamoItemRepository() ItemConfiguration {
 }
 
 func (i *ItemService) CreateItem(itemID uuid.UUID) (*aggregate.Item, error) {
-    item, err := aggregate.NewItem("test", 100, itemID)
-    
+	item, err := aggregate.NewItem("test", 100, itemID)
+
 	if err != nil {
 		return nil, err
 	}
-    error := i.items.CreateItem(&item)
-    if error != nil {
-        return nil, error
-    }
+	error := i.items.CreateItem(&item)
+	if error != nil {
+		return nil, error
+	}
 	log.Printf("customer: %v", item)
 	return &item, nil
 }

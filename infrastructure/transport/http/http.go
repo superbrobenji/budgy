@@ -1,4 +1,4 @@
-//Depricated: Moved to microservice architecture
+// Depricated: Moved to microservice architecture
 package transport
 
 import (
