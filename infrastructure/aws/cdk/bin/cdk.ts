@@ -5,8 +5,6 @@ import { BudgyStack } from '../lib/cdk-stack';
 
 dotenv.config()
 const app = new cdk.App();
-console.log(process.env.VERSION)
-console.log(process.env.AWS_ACCOUNT)
 new BudgyStack(app, `BudgyStack${process.env.VERSION}`, {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
