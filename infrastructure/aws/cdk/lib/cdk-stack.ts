@@ -1,4 +1,5 @@
 import { CfnResource, Stack, StackProps } from 'aws-cdk-lib/core';
+import * as dotenv from 'dotenv'
 import { Construct } from 'constructs';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as go from '@aws-cdk/aws-lambda-go-alpha';
@@ -18,6 +19,7 @@ export class BudgyStack extends Stack {
     public readonly table: dynamodb.Table;
     constructor(scope: Construct, id: string, props?: StackProps) {
         super(scope, id, props);
+        dotenv.config()
 
         //DynamoDB tables
         this.table = new dynamodb.Table(this, 'dynamodbCategoriesStack', {
