@@ -1,12 +1,7 @@
 [
   {
-    "route": "/",
+    "route": "/createItemTest",
     "method": "GET",
-    "service": "createTransactionTest"
-  },
-  {
-    "route": "/api",
-    "method": "GET",
-    "service": "readItemsTest"
+    "service": "createItemTest"
   }
 ]
