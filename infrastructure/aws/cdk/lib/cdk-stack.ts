@@ -16,24 +16,23 @@ import { HttpLambdaIntegration } from 'aws-cdk-lib/aws-apigatewayv2-integrations
 //import { CfnIntegration, CfnRoute, HttpApi } from 'aws-cdk-lib/aws-apigatewayv2';
 
 export class BudgyStack extends Stack {
-    public readonly table: dynamodb.Table;
     constructor(scope: Construct, id: string, props?: StackProps) {
         super(scope, id, props);
         dotenv.config()
 
         //DynamoDB tables
-        this.table = new dynamodb.Table(this, 'dynamodbCategoriesStack', {
+        const categoriesTable = new dynamodb.Table(this, 'dynamodbCategoriesStack', {
             partitionKey: { name: 'Id', type: dynamodb.AttributeType.STRING },
             billingMode: dynamodb.BillingMode.PAY_PER_REQUEST, // Use on-demand billing
             tableName: 'categories'
         });
 
-        this.table = new dynamodb.Table(this, 'dynamodbItemsStack', {
+        const itemsTable = new dynamodb.Table(this, 'dynamodbItemsStack', {
             partitionKey: { name: 'Id', type: dynamodb.AttributeType.STRING },
             billingMode: dynamodb.BillingMode.PAY_PER_REQUEST, // Use on-demand billing
             tableName: 'items'
         });
-        this.table = new dynamodb.Table(this, 'dynamodbTransactionsStack', {
+        const transactionsTable = new dynamodb.Table(this, 'dynamodbTransactionsStack', {
             partitionKey: { name: 'Id', type: dynamodb.AttributeType.STRING },
             billingMode: dynamodb.BillingMode.PAY_PER_REQUEST, // Use on-demand billing
             tableName: 'transactions'
@@ -67,13 +66,11 @@ export class BudgyStack extends Stack {
         for (let i = 0; i < fileNames.length; i++) {
             const lambdaFunc = new go.GoFunction(this, fileNames[i], {
                 entry: path.join(directories[i]),
-                bundling: {
-                    environment: {
-                        TABLE_NAME: this.table.tableName
-                    }
-                }
             });
-            this.table.grantReadWriteData(lambdaFunc);
+            //TODO create dynamic table access for each lambda function
+            itemsTable.grantReadWriteData(lambdaFunc);
+            transactionsTable.grantReadWriteData(lambdaFunc);
+            categoriesTable.grantReadWriteData(lambdaFunc);
             // API Gateway route factory
             for (const routeDef of routeDefs) {
                 const serviceName = path.basename(directories[i]);
