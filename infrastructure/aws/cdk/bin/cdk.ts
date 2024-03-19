@@ -13,17 +13,25 @@ if (!process.env.VERSION) {
 const version = process.env.VERSION.charAt(0).toUpperCase() + process.env.VERSION.slice(1)
 const dashedVersion = version.replace('.', '-')
 
-const authStack = new AuthStack(app, `AuthStack${dashedVersion}`, {
+const authStack = new AuthStack(app, `BudgyAuthStack${dashedVersion}`, {
     userpoolConstructName: `BudgyUserpool${dashedVersion}`,
     hasCognitoGroups: false,
     identitypoolConstructName: `BudgyIdentityPool${dashedVersion}`,
+    env: {
+        account: process.env.AWS_ACCOUNT as string,
+        region: process.env.AWS_REGION as string,
+    },
 });
 
-const databaseStack = new DatabaseStack(app, `DatabaseStack${dashedVersion}`, {
+const databaseStack = new DatabaseStack(app, `BudgyDatabaseStack${dashedVersion}`, {
+    env: {
+        account: process.env.AWS_ACCOUNT as string,
+        region: process.env.AWS_REGION as string,
+    },
 });
 
 
-new ApiStack(app, `BudgyStack${dashedVersion}`, {
+new ApiStack(app, `BudgyApiStack${dashedVersion}`, {
     env: {
         account: process.env.AWS_ACCOUNT as string,
         region: process.env.AWS_REGION as string,
