@@ -9,8 +9,7 @@ const getFileNamesAndDirectories = (dir: string): { fileNames: string[], directo
         const file = handlerDirectory + '.go';
         const filePath = path.join(dir, handlerDirectory);
 
-        const fileNameLowerCase = file.split('.')[0];
-        const fileName = fileNameLowerCase.charAt(0).toUpperCase() + fileNameLowerCase.slice(1);
+        const fileName = file.split('.')[0];
 
         fileNames.push(fileName);
         directories.push(filePath);
