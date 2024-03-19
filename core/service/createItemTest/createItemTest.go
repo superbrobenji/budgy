@@ -18,12 +18,12 @@ type ItemService struct {
 // NewItemService creates a new ItemService takes in a variadic number of ItemConfiguration functions
 func NewItemService(cfgs ...ItemConfiguration) (*ItemService, error) {
 	is := &ItemService{}
-    for _, cfg := range cfgs {
-        err := cfg(is)
-        if err != nil {
-            return nil, err
-        }
-    }
+	for _, cfg := range cfgs {
+		err := cfg(is)
+		if err != nil {
+			return nil, err
+		}
+	}
 	withDynamoItemRepository()(is)
 	return is, nil
 }
