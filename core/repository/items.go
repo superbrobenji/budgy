@@ -14,10 +14,13 @@ var (
 	ErrDeleteItem      = errors.New("failed to delete item")
 )
 
-type ItemRepository interface {
-	GetItemsByCategoryID(uuid.UUID) (*[]*aggregate.Item, error)
-	GetItemByID(uuid.UUID) (*aggregate.Item, error)
+type ItemRepositoryWrite interface {
 	CreateItem(*aggregate.Item) error
 	DeleteItem(uuid.UUID) error
 	UpdateItem(*aggregate.Item) error
+}
+
+type ItemRepositoryRead interface {
+    GetItemsByCategoryID(uuid.UUID) (*[]*aggregate.Item, error)
+    GetItemByID(uuid.UUID) (*aggregate.Item, error)
 }

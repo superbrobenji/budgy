@@ -14,10 +14,13 @@ var (
 	ErrDeleteCategory      = errors.New("failed to delete category")
 )
 
-type CategoryRepository interface {
-	GetCategoryByID(uuid.UUID) (aggregate.Category, error)
-	GetCategoryByItemID(uuid.UUID) (aggregate.Category, error)
+type CategoryRepositoryWrite interface {
 	CreateCategory(aggregate.Category) error
 	UpdateCategory(aggregate.Category) error
 	DeleteCategory(uuid.UUID) error
+}
+
+type CategoryRepositoryRead interface {
+    GetCategoryByID(uuid.UUID) (aggregate.Category, error)
+    GetCategoryByItemID(uuid.UUID) (aggregate.Category, error)
 }

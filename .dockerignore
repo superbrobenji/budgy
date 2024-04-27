@@ -1,7 +1,0 @@
-#.dockerignore
-**/cdk/**/*
-/readme.md
-/.git/**
-/.gitignore
-/.env
-

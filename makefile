@@ -140,4 +140,4 @@ deploy/prod:
 ## destroy/prod: destroy the application in production
 .PHONY: destroy/prod
 destroy/prod:
-	cd ./infrastructure/aws/cdk; cdk destroy
+	cd ./infrastructure/aws/cdk; cdk destroy --all

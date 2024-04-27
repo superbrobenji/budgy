@@ -6,18 +6,18 @@ import (
 	"github.com/google/uuid"
 	"github.com/superbrobenji/budgy/core/aggregate"
 	"github.com/superbrobenji/budgy/core/repository"
-	datastore "github.com/superbrobenji/budgy/infrastructure/persistence/dataStore/dynamo/item"
+	datastore "github.com/superbrobenji/budgy/infrastructure/persistence/dataStore/item"
 )
 
-type ItemConfiguration func(is *ItemService) error
+type IncomeConfiguration func(is *IncomeService) error
 
-type ItemService struct {
+type IncomeService struct {
 	items repository.ItemRepositoryWrite
 }
 
-// NewItemService creates a new ItemService takes in a variadic number of ItemConfiguration functions
-func NewItemService(cfgs ...ItemConfiguration) (*ItemService, error) {
-	is := &ItemService{}
+// NewItemService creates a new IncomeService takes in a variadic number of IncomeConfiguration functions
+func NewIncomeService(cfgs ...IncomeConfiguration) (*IncomeService, error) {
+	is := &IncomeService{}
 	for _, cfg := range cfgs {
 		err := cfg(is)
 		if err != nil {
@@ -29,19 +29,19 @@ func NewItemService(cfgs ...ItemConfiguration) (*ItemService, error) {
 }
 
 // example of a configuration function
-func withItemRepository(cr repository.ItemRepositoryWrite) ItemConfiguration {
-	return func(is *ItemService) error {
+func withItemRepositoryWrite(cr repository.ItemRepositoryWrite) IncomeConfiguration {
+	return func(is *IncomeService) error {
 		is.items = cr
 		return nil
 	}
 }
 
-func withDynamoItemRepository() ItemConfiguration {
+func withDynamoItemRepository() IncomeConfiguration {
 	cr := datastore.NewDynamoItemRepository()
-	return withItemRepository(cr)
+	return withItemRepositoryWrite(cr)
 }
 
-func (i *ItemService) CreateItem(itemID uuid.UUID) (*aggregate.Item, error) {
+func (i *IncomeService) CreateItem(itemID uuid.UUID) (*aggregate.Item, error) {
 	item, err := aggregate.NewItem("test", 100, itemID)
 
 	if err != nil {

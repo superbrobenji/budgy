@@ -1,101 +1,113 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DatabaseStack = void 0;
-import { CfnOutput, Stack, StackProps } from 'aws-cdk-lib'
+import { CfnOutput, Stack, StackProps } from "aws-cdk-lib";
 import {
-    AccountRecovery,
-    CfnUserPoolGroup,
-    UserPool,
-    UserPoolClient,
-    VerificationEmailStyle,
-} from 'aws-cdk-lib/aws-cognito'
-import { Construct } from 'constructs'
+  AccountRecovery,
+  CfnUserPoolGroup,
+  UserPool,
+  UserPoolClient,
+  VerificationEmailStyle,
+} from "aws-cdk-lib/aws-cognito";
+import { Construct } from "constructs";
 import {
-    IdentityPool,
-    UserPoolAuthenticationProvider,
-} from '@aws-cdk/aws-cognito-identitypool-alpha'
-import { IRole } from 'aws-cdk-lib/aws-iam'
+  IdentityPool,
+  UserPoolAuthenticationProvider,
+} from "@aws-cdk/aws-cognito-identitypool-alpha";
+import { IRole } from "aws-cdk-lib/aws-iam";
+import { Runtime, Function, Code } from "aws-cdk-lib/aws-lambda";
+import path = require("path");
 
 interface AuthStackProps extends StackProps {
-    readonly userpoolConstructName: string
-    readonly hasCognitoGroups: boolean
-    readonly groupNames?: string[]
-    readonly identitypoolConstructName: string
+  readonly userpoolConstructName: string;
+  readonly hasCognitoGroups: boolean;
+  readonly groupNames?: string[];
+  readonly identitypoolConstructName: string;
 }
 
 export class AuthStack extends Stack {
-    public readonly identityPoolId: CfnOutput
-    public readonly authenticatedRole: IRole
-    public readonly unauthenticatedRole: IRole
-    public readonly userpool: UserPool
-    constructor(scope: Construct, id: string, props: AuthStackProps) {
-        super(scope, id, props)
+  public readonly identityPoolId: CfnOutput;
+  public readonly authenticatedRole: IRole;
+  public readonly unauthenticatedRole: IRole;
+  public readonly userpool: UserPool;
+  constructor(scope: Construct, id: string, props: AuthStackProps) {
+    super(scope, id, props);
 
-        const userPool = new UserPool(this, `${props.userpoolConstructName}`, {
-            selfSignUpEnabled: true,
-            accountRecovery: AccountRecovery.PHONE_AND_EMAIL,
-            userVerification: {
-                emailStyle: VerificationEmailStyle.CODE,
-            },
-            autoVerify: {
-                email: true,
-            },
-            standardAttributes: {
-                email: {
-                    required: true,
-                    mutable: true,
-                },
-            },
-        })
+    const saveUserToDB = new Function(this, "saveUserToDB", {
+      runtime: Runtime.NODEJS_20_X,
+      handler: "createAuthUser.handler",
+      code: Code.fromAsset(path.join(__dirname, "lambdas")),
+    });
 
-        if (props.hasCognitoGroups) {
-            props.groupNames?.forEach(
-                (groupName: string) =>
-                    new CfnUserPoolGroup(
-                        this,
-                        `${props.userpoolConstructName}${groupName}Group`,
-                        {
-                            userPoolId: userPool.userPoolId,
-                            groupName: groupName,
-                        }
-                    )
-            )
-        }
+    const userPool = new UserPool(this, `${props.userpoolConstructName}`, {
+      selfSignUpEnabled: true,
+      userPoolName: props.userpoolConstructName,
+      accountRecovery: AccountRecovery.PHONE_AND_EMAIL,
+      userVerification: {
+        emailStyle: VerificationEmailStyle.CODE,
+      },
+      autoVerify: {
+        email: true,
+      },
+      standardAttributes: {
+        email: {
+          required: true,
+          mutable: true,
+        },
+      },
+      lambdaTriggers: {
+        postAuthentication: saveUserToDB,
+      },
+    });
 
-        const userPoolClient = new UserPoolClient(
+    if (props.hasCognitoGroups) {
+      props.groupNames?.forEach(
+        (groupName: string) =>
+          new CfnUserPoolGroup(
             this,
-            `${props.userpoolConstructName}Client`,
+            `${props.userpoolConstructName}${groupName}Group`,
             {
-                userPool,
-            }
-        )
-
-        const identityPool = new IdentityPool(
-            this,
-            props.identitypoolConstructName,
-            {
-                identityPoolName: props.identitypoolConstructName,
-                allowUnauthenticatedIdentities: true,
-                authenticationProviders: {
-                    userPools: [
-                        new UserPoolAuthenticationProvider({ userPool, userPoolClient }),
-                    ],
-                },
-            }
-        )
-
-        this.authenticatedRole = identityPool.authenticatedRole
-        this.unauthenticatedRole = identityPool.unauthenticatedRole
-        this.userpool = userPool
-        new CfnOutput(this, 'UserPoolId', {
-            value: userPool.userPoolId,
-        })
-
-        new CfnOutput(this, 'UserPoolClientId', {
-            value: userPoolClient.userPoolClientId,
-        })
-        this.identityPoolId = new CfnOutput(this, 'IdentityPoolId', {
-            value: identityPool.identityPoolId,
-        })
+              userPoolId: userPool.userPoolId,
+              groupName: groupName,
+            },
+          ),
+      );
     }
+
+    const userPoolClient = new UserPoolClient(
+      this,
+      `${props.userpoolConstructName}Client`,
+      {
+        userPool,
+      },
+    );
+
+    const identityPool = new IdentityPool(
+      this,
+      props.identitypoolConstructName,
+      {
+        identityPoolName: props.identitypoolConstructName,
+        allowUnauthenticatedIdentities: true,
+        authenticationProviders: {
+          userPools: [
+            new UserPoolAuthenticationProvider({ userPool, userPoolClient }),
+          ],
+        },
+      },
+    );
+
+    this.authenticatedRole = identityPool.authenticatedRole;
+    this.unauthenticatedRole = identityPool.unauthenticatedRole;
+    this.userpool = userPool;
+    new CfnOutput(this, "UserPoolId", {
+      value: userPool.userPoolId,
+    });
+
+    new CfnOutput(this, "UserPoolClientId", {
+      value: userPoolClient.userPoolClientId,
+    });
+    this.identityPoolId = new CfnOutput(this, "IdentityPoolId", {
+      value: identityPool.identityPoolId,
+    });
+  }
 }

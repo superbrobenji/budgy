@@ -14,10 +14,12 @@ var (
 	ErrDeleteTransaction      = errors.New("failed to delete transaction")
 )
 
-type TransactionRepository interface {
-	GetTransactionsByItemID(uuid.UUID) (aggregate.Category, error)
-	GetTransactionsByDate(time.Time, time.Time) error
-	GetTransactionByID(uuid.UUID) error
+type TransactionRepositoryWrite interface {
 	CreateTransaction(aggregate.Transaction) error
 	DeleteTransaction(uuid.UUID) error
+}
+type TransactionRepositoryRead interface { 
+    GetTransactionsByItemID(uuid.UUID) (aggregate.Category, error)
+    GetTransactionsByDate(time.Time, time.Time) error
+    GetTransactionByID(uuid.UUID) error
 }
