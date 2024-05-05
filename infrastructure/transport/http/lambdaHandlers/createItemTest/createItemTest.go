@@ -7,12 +7,6 @@ import (
 	services "github.com/superbrobenji/budgy/core/service/createItemTest"
 )
 
-type book struct {
-	ISBN   string `json:"isbn"`
-	Title  string `json:"title"`
-	Author string `json:"author"`
-}
-
 func getItems() (*aggregate.Item, error) {
 	itemService, err := services.NewItemService()
 	if err != nil {

@@ -10,7 +10,7 @@ export class DatabaseStack extends Stack {
     super(scope, id, props);
 
     const usersTable = new TableV2(this, "dynamoUsersStack", {
-      partitionKey: { name: "UserID", type: AttributeType.STRING },
+      partitionKey: { name: "Id", type: AttributeType.STRING },
       billing: Billing.onDemand(),
       tableName: "users",
     });

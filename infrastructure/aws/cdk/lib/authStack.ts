@@ -15,15 +15,16 @@ import {
   UserPoolAuthenticationProvider,
 } from "@aws-cdk/aws-cognito-identitypool-alpha";
 import { IRole } from "aws-cdk-lib/aws-iam";
-import { Runtime, Function, Code } from "aws-cdk-lib/aws-lambda";
 import path = require("path");
 import { GoFunction } from "@aws-cdk/aws-lambda-go-alpha/lib/function";
+import { TableV2 } from "aws-cdk-lib/aws-dynamodb";
 
 interface AuthStackProps extends StackProps {
   readonly userpoolConstructName: string;
   readonly hasCognitoGroups: boolean;
   readonly groupNames?: string[];
   readonly identitypoolConstructName: string;
+  tables: { [key: string]: TableV2 };
 }
 
 export class AuthStack extends Stack {
@@ -39,6 +40,7 @@ export class AuthStack extends Stack {
       entry: lambdaPath,
       functionName: "saveUserToDB",
     });
+    props.tables.usersTable.grantReadWriteData(saveUserToDB);
 
     const userPool = new UserPool(this, `${props.userpoolConstructName}`, {
       selfSignUpEnabled: true,

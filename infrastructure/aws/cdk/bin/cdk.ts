@@ -18,13 +18,6 @@ const env = {
   region: process.env.AWS_REGION as string,
 };
 
-const authStack = new AuthStack(app, `BudgyAuthStack${dashedVersion}`, {
-  userpoolConstructName: `BudgyUserpool${dashedVersion}`,
-  hasCognitoGroups: false,
-  identitypoolConstructName: `BudgyIdentityPool${dashedVersion}`,
-  env,
-});
-
 const databaseStack = new DatabaseStack(
   app,
   `BudgyDatabaseStack${dashedVersion}`,
@@ -32,6 +25,14 @@ const databaseStack = new DatabaseStack(
     env,
   },
 );
+
+const authStack = new AuthStack(app, `BudgyAuthStack${dashedVersion}`, {
+  userpoolConstructName: `BudgyUserpool${dashedVersion}`,
+  hasCognitoGroups: false,
+  identitypoolConstructName: `BudgyIdentityPool${dashedVersion}`,
+  tables: databaseStack.tables,
+  env,
+});
 
 new ApiStack(app, `BudgyApiStack${dashedVersion}`, {
   env: {

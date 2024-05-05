@@ -10,7 +10,7 @@ import {
   HttpMethod,
 } from "aws-cdk-lib/aws-apigatewayv2";
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
-import { Table } from "aws-cdk-lib/aws-dynamodb";
+import { TableV2 } from "aws-cdk-lib/aws-dynamodb";
 import { UserPool } from "aws-cdk-lib/aws-cognito";
 import { Authorizer } from "aws-cdk-lib/aws-apigateway";
 import { HttpUserPoolAuthorizer } from "aws-cdk-lib/aws-apigatewayv2-authorizers";
@@ -23,7 +23,7 @@ interface ApiStackProps extends StackProps {
     version: string;
     routeApiEndpoint: string;
   };
-  tables: { [key: string]: Table };
+  tables: { [key: string]: TableV2 };
   userPool: UserPool;
 }
 

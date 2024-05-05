@@ -3,7 +3,6 @@ package datastore
 import (
 	"errors"
 	"reflect"
-	"strconv"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
@@ -39,7 +38,7 @@ func NewDynamoTransaction(transaction *aggregate.Transaction) (dynamoTransaction
 		Id:     transaction.GetID().String(),
 		Name:   transaction.GetName(),
 		Amount: transaction.GetAmount(),
-		Date:   strconv.FormatInt(transaction.GetDate().Unix(), 10),
+		Date:   transaction.GetDate().String(),
 		ItemID: transaction.GetItemID().String(),
 	}, nil
 }
@@ -48,15 +47,9 @@ func NewAggregateTransaction(transaction *dynamoTransaction) (aggregate.Transact
 	if transaction == nil {
 		return aggregate.Transaction{}, ErrNoDynamoObject
 	}
-	intTime, err := strconv.ParseInt(transaction.Date, 10, 64)
+	timeCreated, err := time.Parse(time.RFC1123, transaction.Date)
 	if err != nil {
 		return aggregate.Transaction{}, err
-	}
-	timeCreated := time.Unix(intTime, 0)
-
-	timeCreated, errorParsingTime := time.Parse("2021-11-22", transaction.Date)
-	if errorParsingTime != nil {
-		return aggregate.Transaction{}, ErrParsingTime
 	}
 
 	transactionID, errorParsingUuid := uuid.Parse(transaction.Id)

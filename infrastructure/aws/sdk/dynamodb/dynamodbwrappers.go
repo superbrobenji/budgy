@@ -2,7 +2,6 @@ package sdk
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
@@ -24,9 +23,7 @@ func NewDynamodbClient() *DynamodbClient {
 }
 
 func (ddbClient *DynamodbClient) DynamodbPutWrapper(item interface{}, conditionExp *string, table string) (*dynamodb.PutItemOutput, error) {
-	fmt.Println(item)
 	av, marshalErr := attributevalue.MarshalMap(item)
-	fmt.Println(av)
 	if marshalErr != nil {
 		return &dynamodb.PutItemOutput{}, marshalErr
 	}
