@@ -17,6 +17,7 @@ import {
 import { IRole } from "aws-cdk-lib/aws-iam";
 import { Runtime, Function, Code } from "aws-cdk-lib/aws-lambda";
 import path = require("path");
+import { GoFunction } from "@aws-cdk/aws-lambda-go-alpha/lib/function";
 
 interface AuthStackProps extends StackProps {
   readonly userpoolConstructName: string;
@@ -33,10 +34,10 @@ export class AuthStack extends Stack {
   constructor(scope: Construct, id: string, props: AuthStackProps) {
     super(scope, id, props);
 
-    const saveUserToDB = new Function(this, "saveUserToDB", {
-      runtime: Runtime.NODEJS_20_X,
-      handler: "createAuthUser.handler",
-      code: Code.fromAsset(path.join(__dirname, "lambdas")),
+    const lambdaPath = path.join(__dirname, "lambdas", "saveUserToDB.go");
+    const saveUserToDB = new GoFunction(this, "saveUserToDB", {
+      entry: lambdaPath,
+      functionName: "saveUserToDB",
     });
 
     const userPool = new UserPool(this, `${props.userpoolConstructName}`, {

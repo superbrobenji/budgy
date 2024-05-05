@@ -8,8 +8,13 @@ export class DatabaseStack extends Stack {
   public readonly tables = {};
   constructor(scope: Construct, id: string, props: StackProps) {
     super(scope, id, props);
-    //TODO add users table
-    //DynamoDB tables
+
+    const usersTable = new TableV2(this, "dynamoUsersStack", {
+      partitionKey: { name: "UserID", type: AttributeType.STRING },
+      billing: Billing.onDemand(),
+      tableName: "users",
+    });
+
     const categoriesTable = new TableV2(this, "dynamodbCategoriesStack", {
       partitionKey: { name: "Id", type: AttributeType.STRING },
       sortKey: { name: "userID", type: AttributeType.STRING },
@@ -47,6 +52,7 @@ export class DatabaseStack extends Stack {
       categoriesTable,
       itemsTable,
       transactionsTable,
+      usersTable,
     };
   }
 }
