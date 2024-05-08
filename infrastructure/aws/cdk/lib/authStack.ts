@@ -5,6 +5,7 @@ import { CfnOutput, Stack, StackProps } from "aws-cdk-lib";
 import {
   AccountRecovery,
   CfnUserPoolGroup,
+  OAuthScope,
   UserPool,
   UserPoolClient,
   VerificationEmailStyle,
@@ -82,6 +83,15 @@ export class AuthStack extends Stack {
       `${props.userpoolConstructName}Client`,
       {
         userPool,
+        oAuth: {
+          flows: {
+            authorizationCodeGrant: true,
+          },
+          scopes: [OAuthScope.OPENID, OAuthScope.EMAIL, OAuthScope.PHONE],
+          callbackUrls: [""],
+          logoutUrls: [""],
+        },
+        userPoolClientName: "budgy-client",
       },
     );
 
