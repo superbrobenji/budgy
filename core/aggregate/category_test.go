@@ -124,7 +124,12 @@ func TestCategory_AddItem(t *testing.T) {
 	if error != nil {
 		t.Fatalf("unexpected error %v", error)
 	}
-	item1 := &entity.Item{
+	ite, error := aggregate.NewItem(
+		"Jhon",
+		total,
+		category.GetID(),
+	)
+	item1 := &aggregate.Item{
 		Name: "John",
 		ID:   uuid.New(),
 		Budget: &valueobject.Budget{

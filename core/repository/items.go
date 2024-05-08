@@ -21,6 +21,7 @@ type ItemRepositoryWrite interface {
 }
 
 type ItemRepositoryRead interface {
-    GetItemsByCategoryID(uuid.UUID) (*[]*aggregate.Item, error)
-    GetItemByID(uuid.UUID) (*aggregate.Item, error)
+	GetItemsByCategoryID(uuid.UUID) (*[]*aggregate.Item, error)
+	GetItemByID(uuid.UUID) (*aggregate.Item, error)
+	GetItemsByUserID(string) (*[]*aggregate.Item, error)
 }

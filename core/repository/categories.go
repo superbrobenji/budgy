@@ -21,6 +21,7 @@ type CategoryRepositoryWrite interface {
 }
 
 type CategoryRepositoryRead interface {
-    GetCategoryByID(uuid.UUID) (aggregate.Category, error)
-    GetCategoryByItemID(uuid.UUID) (aggregate.Category, error)
+	GetCategoryByID(uuid.UUID) (aggregate.Category, error)
+	GetCategoryByItemID(uuid.UUID) (aggregate.Category, error)
+	GetCategoriesByUserID(string) (*[]*aggregate.Category, error)
 }

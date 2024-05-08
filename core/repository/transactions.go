@@ -22,4 +22,5 @@ type TransactionRepositoryRead interface {
 	GetTransactionsByItemID(uuid.UUID) (*[]*aggregate.Transaction, error)
 	GetTransactionsByDate(time.Time, time.Time) error
 	GetTransactionByID(uuid.UUID) error
+	GetTransactiondByUserID(string) (*[]*aggregate.Transaction, error)
 }
