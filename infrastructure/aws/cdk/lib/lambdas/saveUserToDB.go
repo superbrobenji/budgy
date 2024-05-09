@@ -4,7 +4,7 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/superbrobenji/budgy/core/repository"
-	services "github.com/superbrobenji/budgy/core/service"
+	services "github.com/superbrobenji/budgy/core/service/auth"
 )
 
 func saveUserToDB(event events.CognitoEventUserPoolsPostAuthentication) (events.CognitoEventUserPoolsPostAuthentication, error) {

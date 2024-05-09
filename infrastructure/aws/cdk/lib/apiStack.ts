@@ -16,6 +16,7 @@ import { UserPool } from "aws-cdk-lib/aws-cognito";
 import { Authorizer } from "aws-cdk-lib/aws-apigateway";
 import { HttpUserPoolAuthorizer } from "aws-cdk-lib/aws-apigatewayv2-authorizers";
 import { GoFunction } from "@aws-cdk/aws-lambda-go-alpha/lib/function";
+import { error } from "console";
 
 interface ApiStackProps extends StackProps {
   env: {
@@ -91,6 +92,15 @@ export class ApiStack extends Stack {
       for (const routeDef of routeDefs) {
         const serviceName = path.basename(directories[i]);
         if (routeDef.handler === serviceName) {
+          if (routeDef.environments) {
+            for (const environment of routeDef.environments) {
+              const env = process.env[environment];
+              if (!env) {
+                throw new Error(`env ${environment} does not exist`);
+              }
+              lambdaFunc.addEnvironment(environment, env);
+            }
+          }
           const route = routeDef.route;
           const method = methodFactory(routeDef.method);
           const lambdaInegration = new HttpLambdaIntegration(

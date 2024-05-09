@@ -8,7 +8,15 @@
   {
     "route": "/signup",
     "method": "POST",
-    "handler": "signUp",
-    "authorizer": false
+    "handler": "signup",
+    "authorizer": false,
+    "environments": ["AWS_COGNITO_CLIENT_ID"]
+  },
+  {
+    "route": "/confirmsignup",
+    "method": "POST",
+    "handler": "confirmSignup",
+    "authorizer": false,
+    "environments": ["AWS_COGNITO_CLIENT_ID"]
   }
 ]

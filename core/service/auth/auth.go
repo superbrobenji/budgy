@@ -22,16 +22,34 @@ func NewAuthService() *authService {
 	}
 }
 
-func (c *authService) SignUp(username string, password string, email string) (*types.AuthenticationResultType, error) {
+func (c *authService) SignUp(username string, password string, email string) (bool, error) {
 	if username == "" || password == "" || email == "" {
-		return nil, ErrInvalidCridentials
+		return false, ErrInvalidCridentials
 	}
 	userConfirmed, err := c.cognito.SignUp(username, password, email)
-	if err != nil {
-		return nil, err
+	return userConfirmed, err
+}
+
+func (c *authService) ConfirmSignUp(username string, confirmationCode string) error {
+	if username == "" || confirmationCode == "" {
+		return ErrInvalidCridentials
 	}
-	if userConfirmed == false {
-		return nil, ErrUserNotConfirmed
+	_, err := c.cognito.ConfirmSignUp(username, confirmationCode)
+	if err != nil {
+		return err
+	}
+
+	// auth, err := c.cognito.SignIn(username, password)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	return nil
+}
+
+func (c *authService) Login(username string, password string) (*types.AuthenticationResultType, error) {
+	if username == "" || password == "" {
+		return nil, ErrInvalidCridentials
 	}
 	auth, err := c.cognito.SignIn(username, password)
 	if err != nil {
