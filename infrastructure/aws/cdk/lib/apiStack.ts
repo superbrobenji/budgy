@@ -4,6 +4,7 @@ import getFileNamesAndDirectories from "../utils/generateLambdaFunctions";
 import * as routeDefs from "../../../transport/http/routeDefs.json";
 import path = require("path");
 import {
+  AddRoutesOptions,
   HttpApi,
   HttpAuthorizer,
   HttpAuthorizerType,
@@ -26,6 +27,13 @@ interface ApiStackProps extends StackProps {
   tables: { [key: string]: TableV2 };
   userPool: UserPool;
 }
+
+type routeOptions = {
+  path: string;
+  methods: string[];
+  integration: HttpLambdaIntegration;
+  authorizer?: HttpUserPoolAuthorizer;
+};
 
 export class ApiStack extends Stack {
   constructor(scope: Construct, id: string, props: ApiStackProps) {
@@ -89,12 +97,15 @@ export class ApiStack extends Stack {
             fileNames[i],
             lambdaFunc,
           );
-          httpApi.addRoutes({
+          let routeOptions: routeOptions = {
             path: baseApiPath + route,
             methods: [method],
             integration: lambdaInegration,
-            authorizer: userPoolAuthorizer,
-          });
+          };
+          if (routeDef.authorizer) {
+            routeOptions.authorizer = userPoolAuthorizer;
+          }
+          httpApi.addRoutes(routeOptions as AddRoutesOptions);
         }
       }
     }

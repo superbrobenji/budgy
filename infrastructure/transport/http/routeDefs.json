@@ -2,6 +2,13 @@
   {
     "route": "/createItemTest",
     "method": "GET",
-    "handler": "createItemTest"
+    "handler": "createItemTest",
+    "authorizer": true
+  },
+  {
+    "route": "/signup",
+    "method": "POST",
+    "handler": "signUp",
+    "authorizer": false
   }
 ]
