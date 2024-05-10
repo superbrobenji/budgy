@@ -18,7 +18,7 @@ func signUp(ctx context.Context, event events.APIGatewayProxyRequest) (events.AP
 			Body:       err.Error(),
 		}, nil
 	}
-	_, err = authService.SignUp(event.QueryStringParameters["username"], event.QueryStringParameters["password"], event.QueryStringParameters["email"])
+	userConfirmed, err := authService.SignUp(event.QueryStringParameters["username"], event.QueryStringParameters["password"], event.QueryStringParameters["email"])
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
@@ -26,23 +26,29 @@ func signUp(ctx context.Context, event events.APIGatewayProxyRequest) (events.AP
 		}, nil
 	}
 
-	auth, err := authService.Login(event.QueryStringParameters["username"], event.QueryStringParameters["password"])
-	if err != nil {
+	if userConfirmed != false {
+		auth, err := authService.Login(event.QueryStringParameters["username"], event.QueryStringParameters["password"])
+		if err != nil {
+			return events.APIGatewayProxyResponse{
+				StatusCode: 500,
+				Body:       err.Error(),
+			}, nil
+		}
+		marshalledAuth, err := json.Marshal(auth)
+		if err != nil {
+			return events.APIGatewayProxyResponse{
+				StatusCode: 500,
+				Body:       err.Error(),
+			}, nil
+		}
 		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
-			Body:       err.Error(),
+			StatusCode: 200,
+			Body:       string(marshalledAuth),
 		}, nil
 	}
-	marshalledAuth, err := json.Marshal(auth)
-	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
-			Body:       err.Error(),
-		}, nil
-	}
+
 	return events.APIGatewayProxyResponse{
-		StatusCode: 200,
-		Body:       string(marshalledAuth),
+		StatusCode: 201,
 	}, nil
 }
 func main() {

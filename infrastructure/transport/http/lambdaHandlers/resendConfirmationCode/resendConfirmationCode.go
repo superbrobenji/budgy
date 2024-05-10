@@ -25,7 +25,7 @@ func resendConfirmationCode(ctx context.Context, event events.APIGatewayProxyReq
 		}, nil
 	}
 	return events.APIGatewayProxyResponse{
-		StatusCode: 202,
+		StatusCode: 201,
 	}, nil
 }
 func main() {

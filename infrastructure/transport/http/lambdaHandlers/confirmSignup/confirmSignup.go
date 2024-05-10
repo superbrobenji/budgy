@@ -25,7 +25,7 @@ func confirmSignUp(ctx context.Context, event events.APIGatewayProxyRequest) (ev
 		}, nil
 	}
 	return events.APIGatewayProxyResponse{
-		StatusCode: 202,
+		StatusCode: 201,
 	}, nil
 }
 func main() {
