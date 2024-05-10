@@ -9,7 +9,7 @@ import (
 	services "github.com/superbrobenji/budgy/core/service/auth"
 )
 
-func confirmSignUp(ctx context.Context, event events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func resendConfirmationCode(ctx context.Context, event events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	authService, err := services.NewAuthService(authService.WithDynamoUserRepository())
 	if err != nil {
 		return events.APIGatewayProxyResponse{
@@ -17,7 +17,7 @@ func confirmSignUp(ctx context.Context, event events.APIGatewayProxyRequest) (ev
 			Body:       err.Error(),
 		}, nil
 	}
-	err = authService.ConfirmSignUp(event.QueryStringParameters["username"], event.QueryStringParameters["confirmationCode"])
+	err = authService.ResendConfirmationCode(event.QueryStringParameters["username"])
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
@@ -29,5 +29,5 @@ func confirmSignUp(ctx context.Context, event events.APIGatewayProxyRequest) (ev
 	}, nil
 }
 func main() {
-	lambda.Start(confirmSignUp)
+	lambda.Start(resendConfirmationCode)
 }

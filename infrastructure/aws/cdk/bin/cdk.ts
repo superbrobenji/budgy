@@ -42,4 +42,5 @@ new ApiStack(app, `BudgyApiStack${dashedVersion}`, {
   },
   tables: databaseStack.tables,
   userPool: authStack.userpool,
+  userPoolClient: authStack.userpoolClient,
 });

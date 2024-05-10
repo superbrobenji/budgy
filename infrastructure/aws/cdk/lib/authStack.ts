@@ -5,6 +5,7 @@ import { CfnOutput, Stack, StackProps } from "aws-cdk-lib";
 import {
   AccountRecovery,
   CfnUserPoolGroup,
+  OAuthScope,
   UserPool,
   UserPoolClient,
   VerificationEmailStyle,
@@ -15,8 +16,6 @@ import {
   UserPoolAuthenticationProvider,
 } from "@aws-cdk/aws-cognito-identitypool-alpha";
 import { IRole } from "aws-cdk-lib/aws-iam";
-import path = require("path");
-import { GoFunction } from "@aws-cdk/aws-lambda-go-alpha/lib/function";
 import { TableV2 } from "aws-cdk-lib/aws-dynamodb";
 
 interface AuthStackProps extends StackProps {
@@ -32,20 +31,13 @@ export class AuthStack extends Stack {
   public readonly authenticatedRole: IRole;
   public readonly unauthenticatedRole: IRole;
   public readonly userpool: UserPool;
+  public readonly userpoolClient: UserPoolClient;
   constructor(scope: Construct, id: string, props: AuthStackProps) {
     super(scope, id, props);
-
-    const lambdaPath = path.join(__dirname, "lambdas", "saveUserToDB.go");
-    const saveUserToDB = new GoFunction(this, "saveUserToDB", {
-      entry: lambdaPath,
-      functionName: "saveUserToDB",
-    });
-    props.tables.usersTable.grantReadWriteData(saveUserToDB);
-
     const userPool = new UserPool(this, `${props.userpoolConstructName}`, {
       selfSignUpEnabled: true,
       userPoolName: props.userpoolConstructName,
-      accountRecovery: AccountRecovery.PHONE_AND_EMAIL,
+      accountRecovery: AccountRecovery.EMAIL_ONLY,
       userVerification: {
         emailStyle: VerificationEmailStyle.CODE,
       },
@@ -57,9 +49,6 @@ export class AuthStack extends Stack {
           required: true,
           mutable: true,
         },
-      },
-      lambdaTriggers: {
-        postAuthentication: saveUserToDB,
       },
     });
 
@@ -82,6 +71,16 @@ export class AuthStack extends Stack {
       `${props.userpoolConstructName}Client`,
       {
         userPool,
+        authFlows: {
+          userPassword: true,
+        },
+        oAuth: {
+          flows: {
+            authorizationCodeGrant: true,
+          },
+          scopes: [OAuthScope.EMAIL],
+        },
+        userPoolClientName: `${props.userpoolConstructName}Client`,
       },
     );
 
@@ -102,6 +101,7 @@ export class AuthStack extends Stack {
     this.authenticatedRole = identityPool.authenticatedRole;
     this.unauthenticatedRole = identityPool.unauthenticatedRole;
     this.userpool = userPool;
+    this.userpoolClient = userPoolClient;
     new CfnOutput(this, "UserPoolId", {
       value: userPool.userPoolId,
     });

@@ -22,8 +22,7 @@ func NewCognitoClient() *CognitoActions {
 }
 
 // SignUp signs up a user with Amazon Cognito.
-func (actor CognitoActions) SignUp(userName string, password string, userEmail string) (bool, error) {
-	confirmed := false
+func (actor CognitoActions) SignUp(userName string, password string, userEmail string) (*cognitoidentityprovider.SignUpOutput, error) {
 	output, err := actor.CognitoClient.SignUp(context.TODO(), &cognitoidentityprovider.SignUpInput{
 		ClientId: aws.String(os.Getenv("AWS_COGNITO_CLIENT_ID")),
 		Password: aws.String(password),
@@ -39,18 +38,27 @@ func (actor CognitoActions) SignUp(userName string, password string, userEmail s
 		} else {
 			log.Printf("Couldn't sign up user %v. Here's why: %v\n", userName, err)
 		}
-	} else {
-		confirmed = output.UserConfirmed
+		return &cognitoidentityprovider.SignUpOutput{}, err
 	}
-	return confirmed, err
+	return output, nil
 }
 
-// SignUp signs up a user with Amazon Cognito.
 func (actor CognitoActions) ConfirmSignUp(userName string, confirmationCode string) (*cognitoidentityprovider.ConfirmSignUpOutput, error) {
 	output, err := actor.CognitoClient.ConfirmSignUp(context.TODO(), &cognitoidentityprovider.ConfirmSignUpInput{
 		ClientId:         aws.String(os.Getenv("AWS_COGNITO_CLIENT_ID")),
 		Username:         aws.String(userName),
 		ConfirmationCode: aws.String(confirmationCode),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return output, err
+}
+
+func (actor CognitoActions) ResendConfirmationCode(userName string) (*cognitoidentityprovider.ResendConfirmationCodeOutput, error) {
+	output, err := actor.CognitoClient.ResendConfirmationCode(context.TODO(), &cognitoidentityprovider.ResendConfirmationCodeInput{
+		ClientId: aws.String(os.Getenv("AWS_COGNITO_CLIENT_ID")),
+		Username: aws.String(userName),
 	})
 	if err != nil {
 		return nil, err

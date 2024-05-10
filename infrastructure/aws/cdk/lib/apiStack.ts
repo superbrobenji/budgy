@@ -6,17 +6,13 @@ import path = require("path");
 import {
   AddRoutesOptions,
   HttpApi,
-  HttpAuthorizer,
-  HttpAuthorizerType,
   HttpMethod,
 } from "aws-cdk-lib/aws-apigatewayv2";
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
 import { TableV2 } from "aws-cdk-lib/aws-dynamodb";
-import { UserPool } from "aws-cdk-lib/aws-cognito";
-import { Authorizer } from "aws-cdk-lib/aws-apigateway";
+import { UserPool, UserPoolClient } from "aws-cdk-lib/aws-cognito";
 import { HttpUserPoolAuthorizer } from "aws-cdk-lib/aws-apigatewayv2-authorizers";
 import { GoFunction } from "@aws-cdk/aws-lambda-go-alpha/lib/function";
-import { error } from "console";
 
 interface ApiStackProps extends StackProps {
   env: {
@@ -27,6 +23,7 @@ interface ApiStackProps extends StackProps {
   };
   tables: { [key: string]: TableV2 };
   userPool: UserPool;
+  userPoolClient: UserPoolClient;
 }
 
 type routeOptions = {
@@ -64,6 +61,7 @@ export class ApiStack extends Stack {
     const userPoolAuthorizer = new HttpUserPoolAuthorizer(
       "userPoolAuthorizer",
       props.userPool,
+      { userPoolClients: [props.userPoolClient] },
     );
 
     const baseApiPath =
@@ -83,11 +81,6 @@ export class ApiStack extends Stack {
         entry: path.join(directories[i]),
         functionName: fileNames[i],
       });
-      //TODO create dynamic table access for each lambda function
-      props.tables.itemsTable.grantReadWriteData(lambdaFunc);
-      props.tables.transactionsTable.grantReadWriteData(lambdaFunc);
-      props.tables.categoriesTable.grantReadWriteData(lambdaFunc);
-      props.tables.usersTable.grantReadWriteData(lambdaFunc);
       // API Gateway route factory
       for (const routeDef of routeDefs) {
         const serviceName = path.basename(directories[i]);
@@ -99,6 +92,15 @@ export class ApiStack extends Stack {
                 throw new Error(`env ${environment} does not exist`);
               }
               lambdaFunc.addEnvironment(environment, env);
+            }
+          }
+          if (routeDef.tables) {
+            for (const table of routeDef.tables) {
+              const dbTable = props.tables[table];
+              if (!dbTable) {
+                throw new Error(`table ${table} does not exist`);
+              }
+              dbTable.grantReadWriteData(lambdaFunc);
             }
           }
           const route = routeDef.route;

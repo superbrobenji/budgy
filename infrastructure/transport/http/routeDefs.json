@@ -10,12 +10,27 @@
     "method": "POST",
     "handler": "signup",
     "authorizer": false,
-    "environments": ["AWS_COGNITO_CLIENT_ID"]
+    "environments": ["AWS_COGNITO_CLIENT_ID"],
+    "tables": ["usersTable"]
   },
   {
     "route": "/confirmsignup",
     "method": "POST",
     "handler": "confirmSignup",
+    "authorizer": false,
+    "environments": ["AWS_COGNITO_CLIENT_ID"]
+  },
+  {
+    "route": "/resendconfirmation",
+    "method": "POST",
+    "handler": "resendConfirmationCode",
+    "authorizer": false,
+    "environments": ["AWS_COGNITO_CLIENT_ID"]
+  },
+  {
+    "route": "/login",
+    "method": "POST",
+    "handler": "login",
     "authorizer": false,
     "environments": ["AWS_COGNITO_CLIENT_ID"]
   }
