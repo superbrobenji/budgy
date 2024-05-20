@@ -18,7 +18,6 @@ interface ApiStackProps extends StackProps {
   env: {
     account: string;
     region: string;
-    version: string;
     routeApiEndpoint: string;
   };
   tables: { [key: string]: TableV2 };
@@ -64,8 +63,7 @@ export class ApiStack extends Stack {
       { userPoolClients: [props.userPoolClient] },
     );
 
-    const baseApiPath =
-      process.env.ROUTE_API_ENDPOINT + "/" + process.env.VERSION;
+    const baseApiPath = props.env.routeApiEndpoint;
     const lambdaPath = path.join(
       __dirname,
       "..",

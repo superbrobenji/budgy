@@ -4,9 +4,15 @@ import { Stack, StackProps } from "aws-cdk-lib";
 import { Construct } from "constructs";
 import { AttributeType, Billing, TableV2 } from "aws-cdk-lib/aws-dynamodb";
 
+interface DbStackProps extends StackProps {
+  env: {
+    account: string;
+    region: string;
+  };
+}
 export class DatabaseStack extends Stack {
   public readonly tables = {};
-  constructor(scope: Construct, id: string, props: StackProps) {
+  constructor(scope: Construct, id: string, props: DbStackProps) {
     super(scope, id, props);
 
     const usersTable = new TableV2(this, "dynamoUsersStack", {

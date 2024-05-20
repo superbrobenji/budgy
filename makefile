@@ -133,11 +133,25 @@ build/docker:
 # ==================================================================================== #
 #
 ## deploy/prod: deploy the application to production
-.PHONY: deploy/prod
-deploy/prod:
+.PHONY: deploy/all
+deploy/all:
 	cd ./infrastructure/aws/cdk; npm run build; cdk deploy --all
 
+## deploy/prod: deploy the application to production
+.PHONY: deploy/db
+deploy/db:
+	cd ./infrastructure/aws/cdk; npm run build; cdk deploy BudgyDatabaseStack
+
+## deploy/prod: deploy the application to production
+.PHONY: deploy/api
+deploy/api:
+	cd ./infrastructure/aws/cdk; npm run build; cdk deploy BudgyApiStack
+
+## deploy/prod: deploy the application to production
+.PHONY: deploy/auth
+deploy/auth:
+	cd ./infrastructure/aws/cdk; npm run build; cdk deploy BudgyAuthStack
 ## destroy/prod: destroy the application in production
-.PHONY: destroy/prod
-destroy/prod:
+.PHONY: destroy/all
+destroy/all:
 	cd ./infrastructure/aws/cdk; cdk destroy --all

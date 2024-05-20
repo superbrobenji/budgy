@@ -7,38 +7,33 @@ import { App } from "aws-cdk-lib";
 
 dotenv.config();
 const app = new App();
-if (!process.env.VERSION) {
-  throw new Error("VERSION environment variable is required");
+if (!process.env.AWS_ACCOUNT || !process.env.AWS_REGION) {
+  throw new Error("AWS environment variable is required");
 }
-const version =
-  process.env.VERSION.charAt(0).toUpperCase() + process.env.VERSION.slice(1);
-const dashedVersion = version.replace(".", "-");
+
+const _routeApiEndpoint = "/api";
+
 const env = {
   account: process.env.AWS_ACCOUNT as string,
   region: process.env.AWS_REGION as string,
 };
 
-const databaseStack = new DatabaseStack(
-  app,
-  `BudgyDatabaseStack${dashedVersion}`,
-  {
-    env,
-  },
-);
+const databaseStack = new DatabaseStack(app, "BudgyDatabaseStack", {
+  env,
+});
 
-const authStack = new AuthStack(app, `BudgyAuthStack${dashedVersion}`, {
-  userpoolConstructName: `BudgyUserpool${dashedVersion}`,
+const authStack = new AuthStack(app, "BudgyAuthStack", {
+  userpoolConstructName: "BudgyUserpool",
   hasCognitoGroups: false,
-  identitypoolConstructName: `BudgyIdentityPool${dashedVersion}`,
+  identitypoolConstructName: "BudgyIdentityPool",
   tables: databaseStack.tables,
   env,
 });
 
-new ApiStack(app, `BudgyApiStack${dashedVersion}`, {
+new ApiStack(app, "BudgyApiStack", {
   env: {
     ...env,
-    version: process.env.VERSION,
-    routeApiEndpoint: process.env.ROUTE_API_ENDPOINT as string,
+    routeApiEndpoint: _routeApiEndpoint,
   },
   tables: databaseStack.tables,
   userPool: authStack.userpool,
