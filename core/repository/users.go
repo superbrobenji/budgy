@@ -26,10 +26,6 @@ type UserRepositoryRead interface {
 }
 
 type UserRepositoryReadWrite interface {
-	CreateUser(*aggregate.User) error
-	DeleteUser(string) error
-	GetUserByID(string) (*aggregate.User, error)
-	GetUserByUsername(string) (*aggregate.User, error)
-	GetUserByEmail(string) (*aggregate.User, error)
-	GetUsersByDateJoined(time.Time, time.Time) (*[]*aggregate.User, error)
+	UserRepositoryRead
+	UserRepositoryWrite
 }

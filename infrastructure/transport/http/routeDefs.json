@@ -1,37 +1,65 @@
 [
-  {
-    "route": "/createItemTest",
-    "method": "GET",
-    "handler": "createItemTest",
-    "authorizer": true
-  },
-  {
-    "route": "/signup",
-    "method": "POST",
-    "handler": "signup",
-    "authorizer": false,
-    "environments": ["AWS_COGNITO_CLIENT_ID"],
-    "tables": ["usersTable"]
-  },
-  {
-    "route": "/confirmsignup",
-    "method": "POST",
-    "handler": "confirmSignup",
-    "authorizer": false,
-    "environments": ["AWS_COGNITO_CLIENT_ID"]
-  },
-  {
-    "route": "/resendconfirmation",
-    "method": "POST",
-    "handler": "resendConfirmationCode",
-    "authorizer": false,
-    "environments": ["AWS_COGNITO_CLIENT_ID"]
-  },
-  {
-    "route": "/login",
-    "method": "POST",
-    "handler": "login",
-    "authorizer": false,
-    "environments": ["AWS_COGNITO_CLIENT_ID"]
-  }
+    {
+        "route": "/createItemTest",
+        "method": "GET",
+        "handler": "createItemTest",
+        "authorizer": true
+    },
+    {
+        "route": "/signup",
+        "method": "POST",
+        "handler": "signup",
+        "authorizer": false,
+        "environments": [
+            "AWS_COGNITO_CLIENT_ID"
+        ],
+        "tables": [
+            "usersTable"
+        ]
+    },
+    {
+        "route": "/confirmsignup",
+        "method": "POST",
+        "handler": "confirmSignup",
+        "authorizer": false,
+        "environments": [
+            "AWS_COGNITO_CLIENT_ID"
+        ]
+    },
+    {
+        "route": "/resendconfirmation",
+        "method": "POST",
+        "handler": "resendConfirmationCode",
+        "authorizer": false,
+        "environments": [
+            "AWS_COGNITO_CLIENT_ID"
+        ]
+    },
+    {
+        "route": "/login",
+        "method": "POST",
+        "handler": "login",
+        "authorizer": false,
+        "environments": [
+            "AWS_COGNITO_CLIENT_ID"
+        ]
+    },
+    {
+        "route": "/resetpassword",
+        "method": "POST",
+        "handler": "resetPasword",
+        "authorizer": false,
+        "environments": [
+            "AWS_COGNITO_CLIENT_ID"
+        ]
+    },
+    {
+        "route": "/confirmresetpassword",
+        "method": "POST",
+        "handler": "confirmResetPasword",
+        "authorizer": false,
+        "environments": [
+            "AWS_COGNITO_CLIENT_ID"
+        ]
+    }
 ]

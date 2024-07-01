@@ -123,3 +123,25 @@ func (u *authService) createNewUser(userId string, email string, username string
 	}
 	return nil
 }
+
+func (u *authService) ResetPassword(username string) error {
+	if username == "" {
+		return ErrInvalidCridentials
+	}
+	_, error := u.cognito.ForgotPassword(username)
+	if error != nil {
+		return error
+	}
+
+	return nil
+}
+func (u *authService) ConfirmResetPassword(username string, code string, password string) error {
+	if username == "" || code == "" || password == "" {
+		return ErrInvalidCridentials
+	}
+	error := u.cognito.ConfirmForgotPassword(code, username, password)
+	if error != nil {
+		return error
+	}
+	return nil
+}
