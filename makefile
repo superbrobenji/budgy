@@ -29,7 +29,6 @@ no-dirty:
 .PHONY: tidy
 tidy:
 	go fmt ./core/...
-	go fmt ./cmd/...
 	go fmt ./infrastructure/aws/sdk/...
 	go fmt ./infrastructure/persistence/...
 	go fmt ./infrastructure/transport/...
@@ -40,7 +39,6 @@ tidy:
 audit:
 	go mod verify
 	go vet ./core/...
-	go vet ./cmd/...
 	go vet ./infrastructure/aws/sdk/...
 	go vet ./infrastructure/persistence/...
 	go vet ./infrastructure/transport/...
@@ -69,44 +67,6 @@ test/cover:
 	go test -v -race -buildvcs -coverprofile=/tmp/coverage.out ./...
 	go tool cover -html=/tmp/coverage.out
 
-## run: DEPRICATED run the  application
-.PHONY: run
-run: build prune
-	docker compose run -p 8080:8080 --name ${BINARY_NAME} ${DEV_BACKEND} 
-	
-## run: DEPRICATED run the  application
-.PHONY: run/prod
-run/prod: build/prod prune
-	docker compose run -p 8080:8080 --name ${BINARY_NAME} ${PROD_BACKEND} 
-
-## run/live: DEPRICATED run the applicatitn with reloading on file changes
-.PHONY: run/live
-run/live:
-	go run github.com/cosmtrek/air@v1.43.0 \
-		--build.cmd "make build" --build.bin "/tmp/bin/${BINARY_NAME}" --build.delay "100" \
-		--build.exclude_dir "" \
-		--build.include_ext "go, tpl, tmpl, html, css, scss, js, ts, sql, jpeg, jpg, gif, png, bmp, svg, webp, ico" \
-		--misc.clean_on_exit "true"
-
-# ==================================================================================== #
-# DOCKER
-# ==================================================================================== #
-#
-## build: DEPRICATED build the dev docker image
-.PHONY: build
-build:
-	docker compose build ${DEV_BACKEND}
-
-## build/prod: DEPRICATED build the prod docker image
-.PHONY: build/prod
-build/prod:
-	docker compose build ${PROD_BACKEND}
-
-
-## prune: DEPRICATED remove all stopped containers and unused images
-.PHONY: prune
-prune:
-	docker system prune -f
 # ==================================================================================== #
 # OPERATIONS
 # ==================================================================================== #
@@ -119,20 +79,24 @@ push: tidy audit no-dirty
 
 ## production/deploy: deploy the application to production
 .PHONY: production/deploy
-production/deploy: confirm tidy no-dirty deploy/prod
+production/deploy: confirm tidy no-dirty deploy/all
 	# Include additional deployment steps here...
 	
-## build/docker: DEPRICATED build the application in docker
-.PHONY: build/docker
-build/docker:
-    # Include additional build steps, like TypeScript, SCSS or Tailwind compilation here...
-	CGO_ENABLED=0 GOOS=linux go build -o /${BINARY_NAME} ${MAIN_PACKAGE_PATH}
-
-# ==================================================================================== #
+j ==================================================================================== #
 # AWS CDK
 # ==================================================================================== #
 #
-## deploy/prod: deploy the application to production
+## npm/build: buils the cdk
+.PHONY: npm/build
+npm/build:
+	cd ./infrastructure/aws/cdk; npm run build
+
+## npm/install: install dependencies for cdk
+.PHONY: npm/install
+npm/install:
+	cd ./infrastructure/aws/cdk; npm install
+
+## deploy/all: deploy the application to production
 .PHONY: deploy/all
 deploy/all:
 	cd ./infrastructure/aws/cdk; npm run build; cdk deploy --all
