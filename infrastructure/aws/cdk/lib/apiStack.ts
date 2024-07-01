@@ -79,7 +79,7 @@ export class ApiStack extends Stack {
             const lambdaFunc = new GoFunction(this, fileNames[i], {
                 entry: path.join(directories[i]),
                 functionName: fileNames[i],
-                tracing: Tracing.PASS_THROUGH,
+                tracing: Tracing.ACTIVE,
             });
             // API Gateway route factory
             for (const routeDef of routeDefs) {
