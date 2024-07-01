@@ -95,8 +95,9 @@ func (actor CognitoActions) ForgotPassword(userName string) (*types.CodeDelivery
 	})
 	if err != nil {
 		log.Printf("Couldn't start password reset for user '%v'. Here;s why: %v\n", userName, err)
+		return nil, err
 	}
-	return output.CodeDeliveryDetails, err
+	return output.CodeDeliveryDetails, nil
 }
 
 // ConfirmForgotPassword confirms a user with a confirmation code and a new password.
