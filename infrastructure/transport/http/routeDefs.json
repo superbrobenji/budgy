@@ -47,7 +47,7 @@
     {
         "route": "/resetpassword",
         "method": "POST",
-        "handler": "resetPasword",
+        "handler": "resetPassword",
         "authorizer": false,
         "environments": [
             "AWS_COGNITO_CLIENT_ID"
@@ -56,7 +56,7 @@
     {
         "route": "/confirmresetpassword",
         "method": "POST",
-        "handler": "confirmResetPasword",
+        "handler": "confirmResetPassword",
         "authorizer": false,
         "environments": [
             "AWS_COGNITO_CLIENT_ID"
