@@ -86,6 +86,11 @@ j ==============================================================================
 # AWS CDK
 # ==================================================================================== #
 #
+## npm/build: buils the cdk
+.PHONY: npm/build
+npm/build:
+	cd ./infrastructure/aws/cdk; npm run build
+
 ## npm/install: install dependencies for cdk
 .PHONY: npm/install
 npm/install:
